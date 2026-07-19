@@ -3,113 +3,673 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login Admin - Absen Harian</title>
+    <title>Dashboard Admin - Absen Harian</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #f0f2f5;
+            padding: 20px;
             min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
         }
-        .login-box {
-            background: white;
-            padding: 40px;
-            border-radius: 20px;
-            max-width: 400px;
-            width: 100%;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-        }
-        .login-box h1 {
-            text-align: center;
-            color: #2c3e50;
-            margin-bottom: 10px;
-        }
-        .login-box .subtitle {
-            text-align: center;
-            color: #7f8c8d;
-            margin-bottom: 30px;
-            font-size: 14px;
-        }
-        .form-group {
-            margin-bottom: 20px;
-        }
-        .form-group label {
-            display: block;
-            font-weight: 600;
-            color: #2c3e50;
-            margin-bottom: 5px;
-        }
-        .form-group input {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
-            font-size: 16px;
-            font-family: 'Poppins', sans-serif;
-        }
-        .form-group input:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-        .btn {
-            width: 100%;
-            padding: 14px;
-            background: linear-gradient(135deg, #667eea, #764ba2);
+        .container { max-width: 1200px; margin: 0 auto; }
+        
+        /* HEADER */
+        .header {
+            background: linear-gradient(135deg, #2c3e50, #34495e);
             color: white;
+            padding: 20px 30px;
+            border-radius: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .header h1 { font-size: 22px; }
+        .header-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+        .btn {
+            padding: 10px 20px;
             border: none;
             border-radius: 10px;
-            font-size: 16px;
             font-weight: 600;
             cursor: pointer;
             font-family: 'Poppins', sans-serif;
-        }
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
-        }
-        .error {
-            background: #f8d7da;
-            color: #721c24;
-            padding: 10px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-        .back-link {
-            display: block;
-            text-align: center;
-            margin-top: 20px;
-            color: #667eea;
+            transition: all 0.3s ease;
+            color: white;
+            font-size: 13px;
             text-decoration: none;
+            display: inline-block;
+        }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 5px 20px rgba(0,0,0,0.2); }
+        .btn-primary { background: #3498db; }
+        .btn-success { background: #27ae60; }
+        .btn-danger { background: #e74c3c; }
+        .btn-warning { background: #f39c12; }
+        .btn-outline { background: transparent; border: 2px solid white; }
+        .btn-sm { padding: 5px 12px; font-size: 12px; }
+        .btn-purple { background: #8e44ad; }
+        .btn-info { background: #1abc9c; }
+        
+        /* ===== DAFTAR TANGGAL ===== */
+        .tanggal-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        
+        .tanggal-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.08);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-left: 5px solid #3498db;
+            position: relative;
+        }
+        .tanggal-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+        }
+        .tanggal-card.active {
+            border-left-color: #e74c3c;
+            background: #f8f9fa;
+        }
+        .tanggal-card .tanggal-text {
+            font-size: 18px;
+            font-weight: 700;
+            color: #2c3e50;
+        }
+        .tanggal-card .tanggal-hari {
+            font-size: 13px;
+            color: #7f8c8d;
+        }
+        .tanggal-card .ringkasan {
+            display: flex;
+            gap: 15px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+        .tanggal-card .ringkasan .item {
+            font-size: 12px;
+            background: #f0f2f5;
+            padding: 4px 12px;
+            border-radius: 20px;
+        }
+        .tanggal-card .ringkasan .item .num {
+            font-weight: 700;
             font-size: 14px;
+        }
+        .tanggal-card .badge-total {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: #3498db;
+            color: white;
+            padding: 3px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .tanggal-card .badge-total.izin { background: #f39c12; }
+        .tanggal-card .badge-total.hadir { background: #27ae60; }
+        
+        .no-tanggal {
+            text-align: center;
+            padding: 40px;
+            color: #7f8c8d;
+            grid-column: 1 / -1;
+        }
+        
+        /* ===== DETAIL TANGGAL ===== */
+        .detail-section {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.08);
+            display: none;
+        }
+        .detail-section.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .detail-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #ecf0f1;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .detail-header h2 {
+            font-size: 20px;
+            color: #2c3e50;
+        }
+        .detail-header .sub-info {
+            font-size: 13px;
+            color: #7f8c8d;
+        }
+        .detail-header .sub-info span {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .table-container {
+            overflow-x: auto;
+        }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        table th {
+            background: #34495e;
+            color: white;
+            padding: 10px 10px;
+            text-align: left;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            white-space: nowrap;
+        }
+        table td { padding: 8px 10px; border-bottom: 1px solid #ecf0f1; }
+        table tr:hover { background: #f8f9fa; }
+        
+        .badge {
+            padding: 3px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            display: inline-block;
+        }
+        .badge-hadir { background: #d4edda; color: #155724; }
+        .badge-izin { background: #fff3cd; color: #856404; }
+        .badge-sakit { background: #f8d7da; color: #721c24; }
+        .badge-dinas { background: #cce5ff; color: #004085; }
+        .badge-pulang { background: #d6d8db; color: #383d41; }
+        
+        .action-btns { display: flex; gap: 5px; flex-wrap: wrap; }
+        
+        .no-data { text-align: center; padding: 30px; color: #7f8c8d; }
+        
+        /* ===== MODAL ===== */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0; top: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6);
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.3s ease;
+        }
+        .modal.active { display: flex; }
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            max-width: 550px;
+            width: 92%;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: slideDown 0.3s ease;
+        }
+        @keyframes slideDown {
+            from { transform: translateY(-30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .modal-content h2 { margin-bottom: 20px; color: #2c3e50; font-size: 20px; }
+        .modal-content .form-group { margin-bottom: 14px; }
+        .modal-content label { display: block; font-weight: 600; font-size: 13px; color: #2c3e50; margin-bottom: 4px; }
+        .modal-content input, .modal-content select, .modal-content textarea {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
+        }
+        .modal-content textarea { resize: vertical; min-height: 60px; }
+        .modal-content .btn-group-modal { display: flex; gap: 10px; margin-top: 20px; }
+        .modal-content .btn-group-modal .btn { flex: 1; text-align: center; }
+        
+        .foto-modal-content {
+            max-width: 500px;
+            text-align: center;
+        }
+        .foto-modal-content img {
+            max-width: 100%;
+            max-height: 70vh;
+            border-radius: 10px;
+            margin: 10px 0;
+        }
+        
+        .back-btn {
+            display: inline-block;
+            margin-bottom: 15px;
+            color: #3498db;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        .back-btn:hover { text-decoration: underline; }
+        
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .header { flex-direction: column; text-align: center; }
+            .header-actions { justify-content: center; }
+            .tanggal-list { grid-template-columns: 1fr; }
+            .tanggal-card .ringkasan { gap: 8px; }
+            .detail-header { flex-direction: column; text-align: center; }
         }
     </style>
 </head>
 <body>
-    <div class="login-box">
-        <h1>🔐 Admin Panel</h1>
-        <div class="subtitle">Masuk untuk mengelola data absen</div>
-        
-        {% if error %}
-        <div class="error">{{ error }}</div>
-        {% endif %}
-        
-        <form method="POST">
-            <div class="form-group">
-                <label>👤 Username</label>
-                <input type="text" name="username" placeholder="Masukkan username" required>
+    <div class="container">
+        <!-- HEADER -->
+        <div class="header">
+            <h1>📊 Dashboard Admin</h1>
+            <div class="header-actions">
+                <button class="btn btn-success" onclick="exportPDF()">📄 Export PDF</button>
+                <button class="btn btn-danger" onclick="deleteAll()">🗑️ Hapus Semua</button>
+                <a href="/" class="btn btn-outline">🏠 Ke Absen</a>
+                <a href="/logout" class="btn btn-outline">🚪 Logout</a>
             </div>
-            <div class="form-group">
-                <label>🔑 Password</label>
-                <input type="password" name="password" placeholder="Masukkan password" required>
+        </div>
+        
+        <!-- DAFTAR TANGGAL -->
+        <div id="tanggalContainer">
+            <div class="tanggal-list" id="tanggalList">
+                <div class="no-tanggal">⏳ Memuat data...</div>
             </div>
-            <button type="submit" class="btn">Login</button>
-        </form>
-        <a href="/" class="back-link">← Kembali ke Absen</a>
+        </div>
+        
+        <!-- DETAIL TANGGAL -->
+        <div class="detail-section" id="detailSection">
+            <div class="detail-header">
+                <div>
+                    <span class="back-btn" onclick="kembaliKeDaftar()">← Kembali ke daftar</span>
+                    <h2 id="detailTanggal">📅 Tanggal</h2>
+                </div>
+                <div class="sub-info" id="detailInfo">
+                    Total: <span id="detailTotal">0</span> data
+                </div>
+            </div>
+            
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>Nama</th>
+                            <th>Jam Masuk</th>
+                            <th>Jam Keluar</th>
+                            <th>Status</th>
+                            <th>Keterangan</th>
+                            <th>Foto</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="detailBody">
+                        <tr><td colspan="8" class="no-data">📭 Tidak ada data</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
+    
+    <!-- MODAL EDIT -->
+    <div class="modal" id="editModal">
+        <div class="modal-content">
+            <h2>✏️ Edit Data</h2>
+            <form id="editForm" onsubmit="updateData(event)">
+                <input type="hidden" id="editId">
+                <div class="form-group">
+                    <label>Nama</label>
+                    <input type="text" id="editNama" required>
+                </div>
+                <div class="form-group">
+                    <label>Jam Masuk</label>
+                    <input type="time" id="editJamMasuk">
+                </div>
+                <div class="form-group">
+                    <label>Jam Keluar</label>
+                    <input type="time" id="editJamKeluar">
+                </div>
+                <div class="form-group">
+                    <label>Status</label>
+                    <select id="editStatus">
+                        <option value="Hadir">Hadir</option>
+                        <option value="Pulang">Pulang</option>
+                        <option value="Izin">Izin</option>
+                        <option value="Sakit">Sakit</option>
+                        <option value="Dinas">Dinas</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Keterangan</label>
+                    <textarea id="editKeterangan" placeholder="Keterangan..."></textarea>
+                </div>
+                <div class="btn-group-modal">
+                    <button type="submit" class="btn btn-success">💾 Simpan</button>
+                    <button type="button" class="btn btn-danger" onclick="closeModal('editModal')">❌ Batal</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- MODAL FOTO -->
+    <div class="modal" id="fotoModal">
+        <div class="modal-content foto-modal-content">
+            <h2>📷 Foto</h2>
+            <img id="fotoPreview" src="" alt="Foto">
+            <div class="btn-group-modal" style="margin-top:15px;">
+                <button class="btn btn-primary" onclick="closeModal('fotoModal')">Tutup</button>
+                <button class="btn btn-success" onclick="downloadFoto()">💾 Download</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let allData = [];
+        let currentTanggal = '';
+        let currentFotoData = null;
+        let dataPerTanggal = {};
+
+        // ============ LOAD DATA ============
+        function loadData() {
+            fetch('/api/data/full')
+                .then(res => res.json())
+                .then(data => {
+                    allData = data;
+                    groupByTanggal(data);
+                    renderTanggalList();
+                })
+                .catch(err => {
+                    document.getElementById('tanggalList').innerHTML = '<div class="no-tanggal">❌ Gagal memuat data</div>';
+                    console.error(err);
+                });
+        }
+
+        // ============ GROUP BY TANGGAL ============
+        function groupByTanggal(data) {
+            dataPerTanggal = {};
+            data.forEach(item => {
+                const tgl = item.tanggal;
+                if (!dataPerTanggal[tgl]) {
+                    dataPerTanggal[tgl] = [];
+                }
+                dataPerTanggal[tgl].push(item);
+            });
+            
+            // Urutkan tanggal dari yang terbaru
+            const sortedKeys = Object.keys(dataPerTanggal).sort((a, b) => {
+                const [d1, m1, y1] = a.split('-');
+                const [d2, m2, y2] = b.split('-');
+                return new Date(y2, m2-1, d2) - new Date(y1, m1-1, d1);
+            });
+            
+            const sorted = {};
+            sortedKeys.forEach(key => {
+                sorted[key] = dataPerTanggal[key];
+            });
+            dataPerTanggal = sorted;
+        }
+
+        // ============ RENDER DAFTAR TANGGAL ============
+        function renderTanggalList() {
+            const container = document.getElementById('tanggalList');
+            const keys = Object.keys(dataPerTanggal);
+            
+            if (keys.length === 0) {
+                container.innerHTML = '<div class="no-tanggal">📭 Belum ada data absen</div>';
+                return;
+            }
+            
+            let html = '';
+            keys.forEach(tgl => {
+                const items = dataPerTanggal[tgl];
+                const total = items.length;
+                const hadir = items.filter(d => d.status === 'Hadir' || d.status === '-').length;
+                const pulang = items.filter(d => d.status === 'Pulang').length;
+                const izin = items.filter(d => ['Izin','Sakit','Dinas'].includes(d.status)).length;
+                
+                // Nama hari
+                const hariMap = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+                const [d, m, y] = tgl.split('-');
+                const dateObj = new Date(y, m-1, d);
+                const hari = hariMap[dateObj.getDay()];
+                
+                html += `
+                    <div class="tanggal-card" onclick="pilihTanggal('${tgl}')">
+                        <div class="tanggal-text">${tgl}</div>
+                        <div class="tanggal-hari">${hari}</div>
+                        <div class="ringkasan">
+                            <span class="item">✅ <span class="num">${hadir}</span> Hadir</span>
+                            <span class="item">🚪 <span class="num">${pulang}</span> Pulang</span>
+                            <span class="item">📝 <span class="num">${izin}</span> Izin</span>
+                            <span class="item">📋 <span class="num">${total}</span> Total</span>
+                        </div>
+                        <span class="badge-total">${total} data</span>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+
+        // ============ PILIH TANGGAL ============
+        function pilihTanggal(tgl) {
+            currentTanggal = tgl;
+            const items = dataPerTanggal[tgl] || [];
+            
+            // Sembunyikan daftar tanggal
+            document.getElementById('tanggalContainer').style.display = 'none';
+            
+            // Tampilkan detail
+            const detail = document.getElementById('detailSection');
+            detail.classList.add('active');
+            
+            // Update header
+            document.getElementById('detailTanggal').textContent = `📅 ${tgl}`;
+            document.getElementById('detailTotal').textContent = items.length;
+            
+            // Render tabel detail
+            renderDetail(items);
+            
+            // Scroll ke detail
+            detail.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        // ============ RENDER DETAIL ============
+        function renderDetail(items) {
+            const tbody = document.getElementById('detailBody');
+            
+            if (!items || items.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" class="no-data">📭 Tidak ada data</td></tr>';
+                return;
+            }
+            
+            let html = '';
+            items.forEach((item, idx) => {
+                const status = item.status || 'Hadir';
+                const badgeClass = getBadgeClass(status);
+                const ket = item.keterangan || '-';
+                
+                let fotoHtml = '-';
+                if (item.foto_masuk && item.foto_masuk.length > 100) {
+                    fotoHtml = `<button class="btn btn-primary btn-sm" onclick="lihatFoto('${item.foto_masuk}')">📷</button>`;
+                } else if (item.foto_keluar && item.foto_keluar.length > 100) {
+                    fotoHtml = `<button class="btn btn-primary btn-sm" onclick="lihatFoto('${item.foto_keluar}')">📷</button>`;
+                }
+                
+                html += `
+                    <tr>
+                        <td>${idx + 1}</td>
+                        <td><strong>${item.nama}</strong></td>
+                        <td>${item.jam_masuk}</td>
+                        <td>${item.jam_keluar}</td>
+                        <td><span class="badge ${badgeClass}">${status}</span></td>
+                        <td style="max-width:120px;word-break:break-word;">${ket}</td>
+                        <td>${fotoHtml}</td>
+                        <td>
+                            <div class="action-btns">
+                                <button class="btn btn-warning btn-sm" onclick="openEdit('${item.id}')">✏️</button>
+                                <button class="btn btn-danger btn-sm" onclick="deleteData('${item.id}')">🗑️</button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+            tbody.innerHTML = html;
+        }
+
+        function getBadgeClass(status) {
+            const map = {
+                'Hadir': 'badge-hadir',
+                'Pulang': 'badge-pulang',
+                'Izin': 'badge-izin',
+                'Sakit': 'badge-sakit',
+                'Dinas': 'badge-dinas'
+            };
+            return map[status] || 'badge-hadir';
+        }
+
+        // ============ KEMBALI KE DAFTAR ============
+        function kembaliKeDaftar() {
+            document.getElementById('tanggalContainer').style.display = 'block';
+            document.getElementById('detailSection').classList.remove('active');
+            renderTanggalList();
+        }
+
+        // ============ DELETE ============
+        function deleteData(id) {
+            if (!confirm('Yakin ingin menghapus data ini?')) return;
+            
+            fetch(`/api/data/delete/${id}`, { method: 'DELETE' })
+                .then(res => res.json())
+                .then(() => {
+                    loadData();
+                    // Jika sedang melihat detail, refresh detail
+                    if (currentTanggal && document.getElementById('detailSection').classList.contains('active')) {
+                        setTimeout(() => {
+                            const items = dataPerTanggal[currentTanggal] || [];
+                            renderDetail(items);
+                            document.getElementById('detailTotal').textContent = items.length;
+                        }, 500);
+                    }
+                })
+                .catch(err => alert('Gagal menghapus!'));
+        }
+
+        function deleteAll() {
+            if (!confirm('⚠️ Yakin ingin menghapus SEMUA data?')) return;
+            if (!confirm('Benar-benar yakin? Tindakan tidak bisa dibatalkan!')) return;
+            
+            fetch('/api/data/delete_all', { method: 'DELETE' })
+                .then(res => res.json())
+                .then(() => {
+                    loadData();
+                    kembaliKeDaftar();
+                })
+                .catch(err => alert('Gagal menghapus!'));
+        }
+
+        // ============ EDIT ============
+        function openEdit(id) {
+            const item = allData.find(d => d.id === id);
+            if (!item) return;
+            
+            document.getElementById('editId').value = id;
+            document.getElementById('editNama').value = item.nama;
+            document.getElementById('editJamMasuk').value = item.jam_masuk === '-' ? '' : item.jam_masuk;
+            document.getElementById('editJamKeluar').value = item.jam_keluar === '-' ? '' : item.jam_keluar;
+            document.getElementById('editStatus').value = item.status || 'Hadir';
+            document.getElementById('editKeterangan').value = item.keterangan || '';
+            
+            document.getElementById('editModal').classList.add('active');
+        }
+
+        function updateData(e) {
+            e.preventDefault();
+            const id = document.getElementById('editId').value;
+            const data = {
+                nama: document.getElementById('editNama').value,
+                jam_masuk: document.getElementById('editJamMasuk').value || '-',
+                jam_keluar: document.getElementById('editJamKeluar').value || '-',
+                status: document.getElementById('editStatus').value,
+                keterangan: document.getElementById('editKeterangan').value
+            };
+            
+            fetch(`/api/data/update/${id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            })
+            .then(res => res.json())
+            .then(() => {
+                closeModal('editModal');
+                loadData();
+                // Refresh detail jika sedang aktif
+                if (currentTanggal && document.getElementById('detailSection').classList.contains('active')) {
+                    setTimeout(() => {
+                        const items = dataPerTanggal[currentTanggal] || [];
+                        renderDetail(items);
+                        document.getElementById('detailTotal').textContent = items.length;
+                    }, 500);
+                }
+                alert('✅ Data berhasil diupdate!');
+            })
+            .catch(err => alert('Gagal update!'));
+        }
+
+        // ============ FOTO ============
+        function lihatFoto(fotoBase64) {
+            if (!fotoBase64 || fotoBase64 === 'Ada Foto') {
+                alert('❌ Data foto tidak lengkap!');
+                return;
+            }
+            currentFotoData = fotoBase64;
+            document.getElementById('fotoPreview').src = fotoBase64;
+            document.getElementById('fotoModal').classList.add('active');
+        }
+
+        function downloadFoto() {
+            if (!currentFotoData) return;
+            const link = document.createElement('a');
+            link.href = currentFotoData;
+            link.download = `foto_${Date.now()}.jpg`;
+            link.click();
+        }
+
+        // ============ MODAL ============
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('active');
+        }
+
+        window.onclick = function(event) {
+            document.querySelectorAll('.modal').forEach(modal => {
+                if (event.target === modal) {
+                    modal.classList.remove('active');
+                }
+            });
+        }
+
+        // ============ EXPORT PDF ============
+        function exportPDF() {
+            window.open('/api/export/pdf', '_blank');
+        }
+
+        // ============ LOAD PERTAMA ============
+        loadData();
+    </script>
 </body>
 </html>
