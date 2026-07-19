@@ -3,6 +3,8 @@ from datetime import datetime
 import json
 import os
 from functools import wraps
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import A4, landscape
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph
@@ -14,11 +16,20 @@ app = Flask(__name__)
 app.secret_key = 'rahasia_admin_absen_12345'
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 
+# ============ RATE LIMITING ============
+limiter = Limiter(
+    app,
+    key_func=get_remote_address,
+    default_limits=["200 per day", "50 per hour"]
+)
+
+# ============ KONFIGURASI LOGIN ============
 ADMIN_USERNAME = 'admin'
 ADMIN_PASSWORD = 'anakanakkesayanganbapak'
 
 DATA_FILE = 'data_absen.json'
 
+# ============ FUNGSI DATABASE ============
 def init_data_file():
     if not os.path.exists(DATA_FILE):
         with open(DATA_FILE, 'w') as f:
@@ -36,6 +47,7 @@ def save_data(data):
     with open(DATA_FILE, 'w') as f:
         json.dump(data, f, indent=4)
 
+# ============ DEKORATOR LOGIN ============
 def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
@@ -44,16 +56,20 @@ def login_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
+# ============ ROUTE HALAMAN ============
 @app.route('/')
+@limiter.limit("30 per minute")
 def index():
     return render_template('index.html')
 
 @app.route('/admin')
 @login_required
+@limiter.limit("20 per minute")
 def admin():
     return render_template('admin.html')
 
 @app.route('/login', methods=['GET', 'POST'])
+@limiter.limit("10 per minute")
 def login():
     if request.method == 'POST':
         username = request.form.get('username')
@@ -72,9 +88,10 @@ def logout():
 
 # ============ API ABSEN ============
 @app.route('/absen_masuk', methods=['POST'])
+@limiter.limit("5 per minute")
 def absen_masuk():
     nama = request.form.get('nama', '').strip()
-    foto = request.form.get('foto', '')  # <-- TERIMA FOTO
+    foto = request.form.get('foto', '')
     
     if not nama:
         return jsonify({'status': 'error', 'message': 'Nama tidak boleh kosong!'})
@@ -95,7 +112,7 @@ def absen_masuk():
         'jam_keluar': '-',
         'status': 'Hadir',
         'keterangan': '-',
-        'foto_masuk': foto if foto else None,  # <-- SIMPAN FOTO
+        'foto_masuk': foto if foto else None,
         'foto_keluar': None
     }
     
@@ -108,13 +125,13 @@ def absen_masuk():
     })
 
 @app.route('/absen_keluar', methods=['POST'])
+@limiter.limit("5 per minute")
 def absen_keluar():
     nama = request.form.get('nama', '').strip()
     foto = request.form.get('foto', '')
     
     if not nama:
         return jsonify({'status': 'error', 'message': 'Nama tidak boleh kosong!'})
-    
     if not foto:
         return jsonify({'status': 'error', 'message': '📸 Harap ambil foto terlebih dahulu!'})
     
@@ -145,6 +162,7 @@ def absen_keluar():
     })
 
 @app.route('/izin', methods=['POST'])
+@limiter.limit("5 per minute")
 def izin():
     nama = request.form.get('nama', '').strip()
     keterangan = request.form.get('keterangan', '').strip()
@@ -155,7 +173,7 @@ def izin():
     if not keterangan:
         return jsonify({'status': 'error', 'message': '📝 Silakan isi keterangan!'})
     if not foto:
-        return jsonify({'status': 'error', 'message': '📸 Harap ambil foto!'})
+        return jsonify({'status': 'error', 'message': '📸 Harap ambil foto!'})https://absen-harian-production.up.railway.app/admin
     
     data = load_data()
     today = datetime.now().strftime("%d-%m-%Y")
@@ -187,6 +205,7 @@ def izin():
 # ============ API ADMIN ============
 @app.route('/api/data')
 @login_required
+@limiter.limit("30 per minute")
 def api_get_data():
     data = load_data()
     for item in data:
@@ -198,6 +217,7 @@ def api_get_data():
 
 @app.route('/api/data/full')
 @login_required
+@limiter.limit("30 per minute")
 def api_get_data_full():
     try:
         data = load_data()
@@ -218,6 +238,7 @@ def api_get_data_full():
 
 @app.route('/api/data/delete/<id>', methods=['DELETE'])
 @login_required
+@limiter.limit("10 per minute")
 def api_delete_data(id):
     data = load_data()
     data = [d for d in data if d.get('id', '') != id]
@@ -226,12 +247,14 @@ def api_delete_data(id):
 
 @app.route('/api/data/delete_all', methods=['DELETE'])
 @login_required
+@limiter.limit("5 per minute")
 def api_delete_all():
     save_data([])
     return jsonify({'status': 'success', 'message': 'Semua data berhasil dihapus!'})
 
 @app.route('/api/data/update/<id>', methods=['PUT'])
 @login_required
+@limiter.limit("10 per minute")
 def api_update_data(id):
     data = load_data()
     new_nama = request.json.get('nama')
@@ -258,6 +281,7 @@ def api_update_data(id):
 # ============ EXPORT PDF ============
 @app.route('/api/export/pdf')
 @login_required
+@limiter.limit("10 per minute")
 def export_pdf():
     data = load_data()
     if not data:
@@ -302,7 +326,9 @@ def export_pdf():
     buffer.seek(0)
     return send_file(buffer, as_attachment=True, download_name=f'rekap_absen_{datetime.now().strftime("%Y%m%d")}.pdf', mimetype='application/pdf')
 
+# ============ WAKTU ============
 @app.route('/get_waktu')
+@limiter.limit("30 per minute")
 def get_waktu():
     now = datetime.now()
     return jsonify({'tanggal': now.strftime("%d %B %Y"), 'jam': now.strftime("%H:%M:%S")})
