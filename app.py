@@ -18,8 +18,8 @@ app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 
 # ============ RATE LIMITING ============
 limiter = Limiter(
-    app,
-    key_func=get_remote_address,
+    get_remote_address,
+    app=app,
     default_limits=["200 per day", "50 per hour"]
 )
 
