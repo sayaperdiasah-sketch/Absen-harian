@@ -498,4 +498,31 @@
             .finally(() => {
                 btnSubmit.disabled = false;
                 btnSubmit.textContent = jenis === 'masuk' ? '✅ Absen Masuk' : 
-                                        jenis === 'keluar' ? '🚪 Absen Keluar
+                                        jenis === 'keluar' ? '🚪 Absen Keluar' : '📝 Kirim Izin';
+            });
+        }
+
+        function showMessage(msg, type) {
+            const div = document.getElementById('message');
+            div.textContent = msg;
+            div.className = 'message ' + type;
+            clearTimeout(window.msgTimeout);
+            window.msgTimeout = setTimeout(() => {
+                div.className = 'message';
+                div.textContent = '';
+            }, 6000);
+        }
+
+        // ============ ENTER ============
+        document.getElementById('nama').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                submitAbsen();
+            }
+        });
+
+        // ============ INISIALISASI ============
+        ubahMode();
+    </script>
+</body>
+</html>
