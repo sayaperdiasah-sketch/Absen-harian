@@ -292,6 +292,31 @@
             100% { transform: rotate(360deg); }
         }
 
+        /* ========== LINK ADMIN ========== */
+        .admin-link {
+            text-align: center;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #ecf0f1;
+        }
+
+        .admin-link a {
+            color: #667eea;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .admin-link a:hover {
+            color: #764ba2;
+            text-decoration: underline;
+        }
+
+        .admin-link .icon {
+            font-size: 16px;
+        }
+
         @media (max-width: 600px) {
             .container {
                 padding: 20px;
@@ -349,6 +374,13 @@
         </form>
 
         <div id="message" class="message"></div>
+
+        <!-- ========== LINK KE ADMIN ========== -->
+        <div class="admin-link">
+            <a href="/login">
+                <span class="icon">🔐</span> Admin Panel
+            </a>
+        </div>
     </div>
 
     <!-- Modal Lihat Data -->
@@ -365,7 +397,7 @@
     </div>
 
     <script>
-        // Update waktu setiap detik
+        // ============ UPDATE WAKTU ============
         function updateWaktu() {
             fetch('/get_waktu')
                 .then(response => response.json())
@@ -381,7 +413,7 @@
         updateWaktu();
         setInterval(updateWaktu, 1000);
 
-        // Fungsi absen
+        // ============ FUNGSI ABSEN ============
         function absen(tipe) {
             const nama = document.getElementById('nama').value.trim();
             const messageDiv = document.getElementById('message');
@@ -392,6 +424,7 @@
                 return;
             }
 
+            // Disable tombol
             document.querySelectorAll('.btn').forEach(btn => btn.disabled = true);
 
             const url = tipe === 'masuk' ? '/absen_masuk' : '/absen_keluar';
@@ -425,7 +458,8 @@
             const messageDiv = document.getElementById('message');
             messageDiv.textContent = message;
             messageDiv.className = 'message ' + type;
-            
+
+            // Auto hide setelah 5 detik
             clearTimeout(window.messageTimeout);
             window.messageTimeout = setTimeout(() => {
                 messageDiv.className = 'message';
@@ -433,11 +467,11 @@
             }, 5000);
         }
 
-        // Fungsi lihat data
+        // ============ LIHAT DATA ============
         function lihatData() {
             const modal = document.getElementById('dataModal');
             const container = document.getElementById('dataContainer');
-            
+
             modal.style.display = 'block';
             container.innerHTML = '<div class="loading" style="margin: 20px auto; display: block;"></div>';
 
@@ -467,7 +501,7 @@
                         html += `
                             <tr>
                                 <td>${index + 1}</td>
-                                <td>${item.nama}</td>
+                                <td><strong>${item.nama}</strong></td>
                                 <td>${item.tanggal}</td>
                                 <td>${item.jam_masuk}</td>
                                 <td>${item.jam_keluar}</td>
@@ -492,6 +526,7 @@
             document.getElementById('dataModal').style.display = 'none';
         }
 
+        // ============ TUTUP MODAL KLIK DI LUAR ============
         window.onclick = function(event) {
             const modal = document.getElementById('dataModal');
             if (event.target === modal) {
@@ -499,6 +534,7 @@
             }
         }
 
+        // ============ ENTER UNTUK ABSEN MASUK ============
         document.getElementById('nama').addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 e.preventDefault();
