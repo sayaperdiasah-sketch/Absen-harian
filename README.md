@@ -15,4 +15,4 @@ Aplikasi web sederhana untuk absensi harian dengan jam otomatis.
 
 ### Install Dependencies
 ```bash
-pip install flask
+pip install flask.
