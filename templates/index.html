@@ -2,16 +2,11 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Form Absen Harian</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Absen Harian</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Poppins', sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -19,325 +14,185 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 20px;
+            padding: 15px;
         }
-
         .container {
             background: white;
             border-radius: 20px;
             box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            padding: 40px;
+            padding: 30px;
             max-width: 500px;
             width: 100%;
             animation: fadeIn 0.5s ease;
         }
-
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(-20px); }
             to { opacity: 1; transform: translateY(0); }
         }
-
-        .header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        .header h1 {
-            font-size: 28px;
-            color: #2c3e50;
-            font-weight: 700;
-        }
-
-        .header .subtitle {
-            font-size: 14px;
-            color: #7f8c8d;
-            margin-top: 5px;
-        }
-
+        .header { text-align: center; margin-bottom: 25px; }
+        .header h1 { font-size: 26px; color: #2c3e50; }
+        .header .subtitle { font-size: 13px; color: #7f8c8d; }
         .waktu-box {
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
             border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 25px;
+            padding: 15px;
+            margin-bottom: 20px;
             text-align: center;
         }
-
-        .waktu-box .tanggal {
-            font-size: 16px;
-            color: #34495e;
-            font-weight: 600;
-        }
-
-        .waktu-box .jam {
-            font-size: 32px;
-            color: #e74c3c;
-            font-weight: 700;
-            margin-top: 5px;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-group label {
-            display: block;
-            font-weight: 600;
-            color: #2c3e50;
-            margin-bottom: 8px;
-            font-size: 14px;
-        }
-
-        .form-group input {
+        .waktu-box .tanggal { font-size: 14px; color: #34495e; font-weight: 600; }
+        .waktu-box .jam { font-size: 28px; color: #e74c3c; font-weight: 700; }
+        
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; font-weight: 600; color: #2c3e50; font-size: 13px; margin-bottom: 5px; }
+        .form-group input, .form-group select, .form-group textarea {
             width: 100%;
-            padding: 12px 15px;
+            padding: 10px 14px;
             border: 2px solid #e0e0e0;
             border-radius: 10px;
-            font-size: 16px;
-            transition: all 0.3s ease;
+            font-size: 15px;
             font-family: 'Poppins', sans-serif;
         }
-
-        .form-group input:focus {
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
             outline: none;
             border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
         }
-
-        .btn-group {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 15px;
-        }
-
+        .form-group textarea { resize: vertical; min-height: 50px; }
+        .form-group select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23333' d='M6 8L1 3h10z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 15px center; }
+        
         .btn {
-            flex: 1;
-            padding: 14px 20px;
+            padding: 12px 18px;
             border: none;
             border-radius: 10px;
-            font-size: 16px;
+            font-size: 15px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
             font-family: 'Poppins', sans-serif;
             color: white;
-        }
-
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
-        }
-
-        .btn:active {
-            transform: translateY(0);
-        }
-
-        .btn-masuk {
-            background: linear-gradient(135deg, #27ae60, #2ecc71);
-        }
-
-        .btn-masuk:hover {
-            background: linear-gradient(135deg, #229954, #27ae60);
-        }
-
-        .btn-keluar {
-            background: linear-gradient(135deg, #e74c3c, #c0392b);
-        }
-
-        .btn-keluar:hover {
-            background: linear-gradient(135deg, #c0392b, #e74c3c);
-        }
-
-        .btn-lihat {
-            background: linear-gradient(135deg, #3498db, #2980b9);
             width: 100%;
-            padding: 12px;
         }
-
-        .btn-lihat:hover {
-            background: linear-gradient(135deg, #2980b9, #3498db);
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 5px 20px rgba(0,0,0,0.2); }
+        .btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+        .btn-hadir { background: linear-gradient(135deg, #27ae60, #2ecc71); }
+        .btn-keluar { background: linear-gradient(135deg, #e74c3c, #c0392b); }
+        .btn-izin { background: linear-gradient(135deg, #f39c12, #e67e22); }
+        
+        .btn-group { display: flex; gap: 8px; margin: 10px 0; }
+        .btn-group .btn { flex: 1; }
+        
+        .camera-section {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 15px;
+            margin: 15px 0;
+            text-align: center;
         }
-
+        .camera-section video {
+            width: 100%;
+            max-height: 300px;
+            background: #000;
+            border-radius: 10px;
+            display: none;
+        }
+        .camera-section canvas {
+            display: none;
+            width: 100%;
+            max-height: 300px;
+            border-radius: 10px;
+        }
+        .camera-section .preview-img {
+            width: 100%;
+            max-height: 300px;
+            border-radius: 10px;
+            object-fit: cover;
+            display: none;
+        }
+        .btn-camera {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            padding: 10px;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+        .btn-capture {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            padding: 10px;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+        .btn-retake {
+            background: linear-gradient(135deg, #95a5a6, #7f8c8d);
+            padding: 10px;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+        .foto-status {
+            font-size: 12px;
+            color: #27ae60;
+            font-weight: 600;
+            margin-top: 5px;
+        }
+        .foto-status.error { color: #e74c3c; }
+        
         .message {
             padding: 12px 15px;
             border-radius: 10px;
             margin-top: 15px;
             display: none;
             font-weight: 500;
+            font-size: 14px;
         }
-
-        .message.success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-            display: block;
-        }
-
-        .message.error {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-            display: block;
-        }
-
-        .modal {
-            display: none;
+        .message.success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; display: block; }
+        .message.error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; display: block; }
+        
+        /* ===== ADMIN ICON ===== */
+        .admin-icon {
             position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.6);
-            animation: fadeIn 0.3s ease;
-        }
-
-        .modal-content {
-            background: white;
-            margin: 5% auto;
-            padding: 30px;
-            border-radius: 20px;
-            max-width: 800px;
-            max-height: 80vh;
-            overflow-y: auto;
-            animation: slideDown 0.3s ease;
-        }
-
-        @keyframes slideDown {
-            from { transform: translateY(-50px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 2px solid #ecf0f1;
-        }
-
-        .modal-header h2 {
-            color: #2c3e50;
-            font-size: 24px;
-        }
-
-        .modal-close {
-            background: #e74c3c;
+            bottom: 15px;
+            right: 15px;
+            background: rgba(44, 62, 80, 0.8);
             color: white;
-            border: none;
-            width: 40px;
-            height: 40px;
+            width: 45px;
+            height: 45px;
             border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             font-size: 20px;
             cursor: pointer;
             transition: all 0.3s ease;
-        }
-
-        .modal-close:hover {
-            transform: rotate(90deg);
-            background: #c0392b;
-        }
-
-        .table-container {
-            overflow-x: auto;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 14px;
-        }
-
-        table th {
-            background: #34495e;
-            color: white;
-            padding: 12px;
-            text-align: left;
-            position: sticky;
-            top: 0;
-        }
-
-        table td {
-            padding: 10px 12px;
-            border-bottom: 1px solid #ecf0f1;
-        }
-
-        table tr:hover {
-            background: #f8f9fa;
-        }
-
-        table tr:nth-child(even) {
-            background: #f8f9fa;
-        }
-
-        .no-data {
-            text-align: center;
-            padding: 40px 20px;
-            color: #7f8c8d;
-            font-size: 16px;
-        }
-
-        .loading {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid #667eea;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        /* ========== LINK ADMIN ========== */
-        .admin-link {
-            text-align: center;
-            margin-top: 20px;
-            padding-top: 15px;
-            border-top: 1px solid #ecf0f1;
-        }
-
-        .admin-link a {
-            color: #667eea;
+            z-index: 999;
+            border: none;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
             text-decoration: none;
-            font-size: 13px;
-            font-weight: 600;
-            transition: all 0.3s ease;
         }
-
-        .admin-link a:hover {
-            color: #764ba2;
-            text-decoration: underline;
+        .admin-icon:hover {
+            transform: scale(1.1);
+            background: rgba(44, 62, 80, 1);
         }
-
-        .admin-link .icon {
-            font-size: 16px;
+        .admin-icon .tooltip {
+            display: none;
+            position: absolute;
+            bottom: 60px;
+            right: 0;
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 8px;
+            font-size: 12px;
+            white-space: nowrap;
         }
-
+        .admin-icon:hover .tooltip {
+            display: block;
+        }
+        
+        .hidden { display: none !important; }
+        
         @media (max-width: 600px) {
-            .container {
-                padding: 20px;
-            }
-
-            .header h1 {
-                font-size: 22px;
-            }
-
-            .waktu-box .jam {
-                font-size: 26px;
-            }
-
-            .btn-group {
-                flex-direction: column;
-            }
-
-            .modal-content {
-                margin: 10% 10px;
-                padding: 20px;
-            }
+            .container { padding: 20px; }
+            .header h1 { font-size: 22px; }
+            .waktu-box .jam { font-size: 24px; }
+            .btn-group { flex-direction: column; }
+            .btn-group .btn { width: 100%; }
         }
     </style>
 </head>
@@ -359,188 +214,288 @@
                 <input type="text" id="nama" placeholder="Masukkan nama lengkap..." required>
             </div>
 
-            <div class="btn-group">
-                <button type="button" class="btn btn-masuk" onclick="absen('masuk')">
-                    ✅ Absen Masuk
+            <div class="form-group">
+                <label for="jenis">📌 Pilih Tindakan</label>
+                <select id="jenis" onchange="ubahMode()">
+                    <option value="masuk">✅ Absen Masuk</option>
+                    <option value="keluar">🚪 Absen Keluar (wajib foto)</option>
+                    <option value="izin">📝 Izin/Sakit/Dinas (wajib foto)</option>
+                </select>
+            </div>
+
+            <div class="form-group hidden" id="keteranganGroup">
+                <label for="keterangan">📝 Keterangan</label>
+                <textarea id="keterangan" placeholder="Contoh: Sakit, keperluan keluarga, dinas luar..."></textarea>
+            </div>
+
+            <!-- KAMERA -->
+            <div class="camera-section" id="cameraSection">
+                <video id="video" autoplay playsinline></video>
+                <canvas id="canvas"></canvas>
+                <img id="previewImg" class="preview-img" alt="Preview Foto">
+                
+                <div id="fotoStatus" class="foto-status">📸 Belum mengambil foto</div>
+                
+                <button type="button" class="btn btn-camera" id="btnKamera" onclick="startCamera()">
+                    📷 Buka Kamera
                 </button>
-                <button type="button" class="btn btn-keluar" onclick="absen('keluar')">
-                    🚪 Absen Keluar
+                <button type="button" class="btn btn-capture hidden" id="btnCapture" onclick="capturePhoto()">
+                    📸 Ambil Foto
+                </button>
+                <button type="button" class="btn btn-retake hidden" id="btnRetake" onclick="retakePhoto()">
+                    🔄 Ambil Ulang
                 </button>
             </div>
 
-            <button type="button" class="btn btn-lihat" onclick="lihatData()">
-                📊 Lihat Data Absen
+            <button type="button" class="btn btn-hadir" id="btnSubmit" onclick="submitAbsen()">
+                ✅ Kirim
             </button>
         </form>
 
         <div id="message" class="message"></div>
-
-        <!-- ========== LINK KE ADMIN ========== -->
-        <div class="admin-link">
-            <a href="/login">
-                <span class="icon">🔐</span> Admin Panel
-            </a>
-        </div>
     </div>
 
-    <!-- Modal Lihat Data -->
-    <div id="dataModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>📊 Data Absen</h2>
-                <button class="modal-close" onclick="tutupModal()">✕</button>
-            </div>
-            <div class="table-container" id="dataContainer">
-                <div class="loading" style="margin: 20px auto; display: block;"></div>
-            </div>
-        </div>
-    </div>
+    <!-- ===== ADMIN ICON (Tersembunyi) ===== -->
+    <a href="/login" class="admin-icon" id="adminIcon" title="Admin Panel">
+        ⚙️
+        <span class="tooltip">Admin Panel</span>
+    </a>
 
     <script>
+        // ============ VARIABEL ============
+        let fotoData = null;
+        let stream = null;
+        let mode = 'masuk';
+        let cameraActive = false;
+
         // ============ UPDATE WAKTU ============
         function updateWaktu() {
             fetch('/get_waktu')
-                .then(response => response.json())
-                .then(data => {
-                    document.getElementById('tanggalDisplay').textContent = data.tanggal;
-                    document.getElementById('jamDisplay').textContent = data.jam;
+                .then(r => r.json())
+                .then(d => {
+                    document.getElementById('tanggalDisplay').textContent = d.tanggal;
+                    document.getElementById('jamDisplay').textContent = d.jam;
                 })
-                .catch(error => {
-                    console.error('Error:', error);
-                });
+                .catch(e => console.error(e));
         }
-
         updateWaktu();
         setInterval(updateWaktu, 1000);
 
-        // ============ FUNGSI ABSEN ============
-        function absen(tipe) {
-            const nama = document.getElementById('nama').value.trim();
-            const messageDiv = document.getElementById('message');
+        // ============ UBAH MODE ============
+        function ubahMode() {
+            mode = document.getElementById('jenis').value;
+            const ketGroup = document.getElementById('keteranganGroup');
+            const btnSubmit = document.getElementById('btnSubmit');
+            const cameraSection = document.getElementById('cameraSection');
+            
+            if (mode === 'izin') {
+                ketGroup.classList.remove('hidden');
+                btnSubmit.className = 'btn btn-izin';
+                btnSubmit.textContent = '📝 Kirim Izin';
+                cameraSection.style.display = 'block';
+                document.getElementById('fotoStatus').textContent = '📸 Wajib ambil foto!';
+                document.getElementById('fotoStatus').className = 'foto-status error';
+            } else if (mode === 'keluar') {
+                ketGroup.classList.add('hidden');
+                btnSubmit.className = 'btn btn-keluar';
+                btnSubmit.textContent = '🚪 Absen Keluar';
+                cameraSection.style.display = 'block';
+                document.getElementById('fotoStatus').textContent = '📸 Wajib ambil foto!';
+                document.getElementById('fotoStatus').className = 'foto-status error';
+            } else {
+                ketGroup.classList.add('hidden');
+                btnSubmit.className = 'btn btn-hadir';
+                btnSubmit.textContent = '✅ Absen Masuk';
+                cameraSection.style.display = 'none';
+                fotoData = null;
+            }
+            
+            // Reset foto
+            fotoData = null;
+            document.getElementById('previewImg').style.display = 'none';
+            document.getElementById('video').style.display = 'none';
+            document.getElementById('canvas').style.display = 'none';
+            document.getElementById('btnCapture').classList.add('hidden');
+            document.getElementById('btnRetake').classList.add('hidden');
+            document.getElementById('btnKamera').classList.remove('hidden');
+            
+            if (stream) {
+                stream.getTracks().forEach(t => t.stop());
+                stream = null;
+                cameraActive = false;
+            }
+        }
 
+        // ============ KAMERA ============
+        function startCamera() {
+            const video = document.getElementById('video');
+            const preview = document.getElementById('previewImg');
+            const btnKamera = document.getElementById('btnKamera');
+            const btnCapture = document.getElementById('btnCapture');
+            const btnRetake = document.getElementById('btnRetake');
+            
+            preview.style.display = 'none';
+            btnCapture.classList.add('hidden');
+            btnRetake.classList.add('hidden');
+            
+            if (stream) {
+                stream.getTracks().forEach(t => t.stop());
+                stream = null;
+            }
+            
+            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                navigator.mediaDevices.getUserMedia({ 
+                    video: { facingMode: 'environment', width: { ideal: 640 } },
+                    audio: false 
+                })
+                .then(s => {
+                    stream = s;
+                    video.srcObject = s;
+                    video.style.display = 'block';
+                    video.play();
+                    cameraActive = true;
+                    btnKamera.textContent = '📷 Kamera Aktif';
+                    btnKamera.className = 'btn btn-camera hidden';
+                    btnCapture.classList.remove('hidden');
+                    document.getElementById('fotoStatus').textContent = '📸 Siap mengambil foto...';
+                    document.getElementById('fotoStatus').className = 'foto-status';
+                })
+                .catch(err => {
+                    alert('❌ Gagal akses kamera. Pastikan izin kamera diberikan!');
+                    console.error(err);
+                    cameraActive = false;
+                    btnKamera.textContent = '📷 Buka Kamera';
+                    btnKamera.className = 'btn btn-camera';
+                });
+            } else {
+                alert('❌ Browser tidak mendukung kamera!');
+            }
+        }
+
+        function capturePhoto() {
+            const video = document.getElementById('video');
+            const canvas = document.getElementById('canvas');
+            const preview = document.getElementById('previewImg');
+            const btnCapture = document.getElementById('btnCapture');
+            const btnRetake = document.getElementById('btnRetake');
+            const fotoStatus = document.getElementById('fotoStatus');
+            
+            if (!cameraActive || !stream) {
+                alert('❌ Kamera belum aktif!');
+                return;
+            }
+            
+            canvas.width = video.videoWidth || 640;
+            canvas.height = video.videoHeight || 480;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            
+            fotoData = canvas.toDataURL('image/jpeg', 0.8);
+            
+            preview.src = fotoData;
+            preview.style.display = 'block';
+            video.style.display = 'none';
+            canvas.style.display = 'none';
+            
+            btnCapture.classList.add('hidden');
+            btnRetake.classList.remove('hidden');
+            
+            fotoStatus.textContent = '✅ Foto berhasil diambil!';
+            fotoStatus.className = 'foto-status';
+            
+            // Matikan kamera
+            if (stream) {
+                stream.getTracks().forEach(t => t.stop());
+                stream = null;
+                cameraActive = false;
+            }
+        }
+
+        function retakePhoto() {
+            fotoData = null;
+            document.getElementById('previewImg').style.display = 'none';
+            document.getElementById('video').style.display = 'none';
+            document.getElementById('btnCapture').classList.add('hidden');
+            document.getElementById('btnRetake').classList.add('hidden');
+            document.getElementById('btnKamera').classList.remove('hidden');
+            document.getElementById('btnKamera').textContent = '📷 Buka Kamera';
+            document.getElementById('btnKamera').className = 'btn btn-camera';
+            document.getElementById('fotoStatus').textContent = '📸 Harap ambil foto ulang';
+            document.getElementById('fotoStatus').className = 'foto-status error';
+            
+            if (stream) {
+                stream.getTracks().forEach(t => t.stop());
+                stream = null;
+                cameraActive = false;
+            }
+        }
+
+        // ============ SUBMIT ============
+        function submitAbsen() {
+            const nama = document.getElementById('nama').value.trim();
+            const jenis = document.getElementById('jenis').value;
+            const keterangan = document.getElementById('keterangan').value.trim();
+            const btnSubmit = document.getElementById('btnSubmit');
+            const messageDiv = document.getElementById('message');
+            
             if (!nama) {
-                showMessage('❌ Silakan masukkan nama terlebih dahulu!', 'error');
+                showMessage('❌ Silakan masukkan nama!', 'error');
                 document.getElementById('nama').focus();
                 return;
             }
-
-            // Disable tombol
-            document.querySelectorAll('.btn').forEach(btn => btn.disabled = true);
-
-            const url = tipe === 'masuk' ? '/absen_masuk' : '/absen_keluar';
-            const formData = new FormData();
+            
+            // Validasi foto untuk keluar dan izin
+            if ((jenis === 'keluar' || jenis === 'izin') && !fotoData) {
+                showMessage('📸 Wajib ambil foto terlebih dahulu!', 'error');
+                return;
+            }
+            
+            if (jenis === 'izin' && !keterangan) {
+                showMessage('📝 Silakan isi keterangan!', 'error');
+                return;
+            }
+            
+            btnSubmit.disabled = true;
+            btnSubmit.textContent = '⏳ Memproses...';
+            
+            let url, formData = new FormData();
             formData.append('nama', nama);
-
+            
+            if (jenis === 'masuk') {
+                url = '/absen_masuk';
+            } else if (jenis === 'keluar') {
+                url = '/absen_keluar';
+                formData.append('foto', fotoData);
+            } else { // izin
+                url = '/izin';
+                formData.append('keterangan', keterangan);
+                formData.append('foto', fotoData);
+            }
+            
             fetch(url, {
                 method: 'POST',
                 body: formData
             })
-            .then(response => response.json())
+            .then(r => r.json())
             .then(data => {
                 if (data.status === 'success') {
                     showMessage(data.message, 'success');
                     document.getElementById('nama').value = '';
+                    document.getElementById('keterangan').value = '';
+                    fotoData = null;
+                    document.getElementById('previewImg').style.display = 'none';
+                    document.getElementById('fotoStatus').textContent = '📸 Belum mengambil foto';
+                    document.getElementById('fotoStatus').className = 'foto-status';
                     document.getElementById('nama').focus();
                 } else {
                     showMessage(data.message, 'error');
                 }
             })
-            .catch(error => {
-                showMessage('❌ Terjadi kesalahan. Silakan coba lagi.', 'error');
-                console.error('Error:', error);
+            .catch(err => {
+                showMessage('❌ Terjadi kesalahan!', 'error');
+                console.error(err);
             })
             .finally(() => {
-                document.querySelectorAll('.btn').forEach(btn => btn.disabled = false);
-            });
-        }
-
-        function showMessage(message, type) {
-            const messageDiv = document.getElementById('message');
-            messageDiv.textContent = message;
-            messageDiv.className = 'message ' + type;
-
-            // Auto hide setelah 5 detik
-            clearTimeout(window.messageTimeout);
-            window.messageTimeout = setTimeout(() => {
-                messageDiv.className = 'message';
-                messageDiv.textContent = '';
-            }, 5000);
-        }
-
-        // ============ LIHAT DATA ============
-        function lihatData() {
-            const modal = document.getElementById('dataModal');
-            const container = document.getElementById('dataContainer');
-
-            modal.style.display = 'block';
-            container.innerHTML = '<div class="loading" style="margin: 20px auto; display: block;"></div>';
-
-            fetch('/get_data')
-                .then(response => response.json())
-                .then(data => {
-                    if (data.length === 0) {
-                        container.innerHTML = '<div class="no-data">📭 Belum ada data absen</div>';
-                        return;
-                    }
-
-                    let html = `
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>No</th>
-                                    <th>Nama</th>
-                                    <th>Tanggal</th>
-                                    <th>Jam Masuk</th>
-                                    <th>Jam Keluar</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                    `;
-
-                    data.forEach((item, index) => {
-                        html += `
-                            <tr>
-                                <td>${index + 1}</td>
-                                <td><strong>${item.nama}</strong></td>
-                                <td>${item.tanggal}</td>
-                                <td>${item.jam_masuk}</td>
-                                <td>${item.jam_keluar}</td>
-                            </tr>
-                        `;
-                    });
-
-                    html += `
-                            </tbody>
-                        </table>
-                    `;
-
-                    container.innerHTML = html;
-                })
-                .catch(error => {
-                    container.innerHTML = '<div class="no-data">❌ Gagal memuat data</div>';
-                    console.error('Error:', error);
-                });
-        }
-
-        function tutupModal() {
-            document.getElementById('dataModal').style.display = 'none';
-        }
-
-        // ============ TUTUP MODAL KLIK DI LUAR ============
-        window.onclick = function(event) {
-            const modal = document.getElementById('dataModal');
-            if (event.target === modal) {
-                modal.style.display = 'none';
-            }
-        }
-
-        // ============ ENTER UNTUK ABSEN MASUK ============
-        document.getElementById('nama').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                absen('masuk');
-            }
-        });
-    </script>
-</body>
-</html>
+                btnSubmit.disabled = false;
+                btnSubmit.textContent = jenis === 'masuk' ? '✅ Absen Masuk' : 
+                                        jenis === 'keluar' ? '🚪 Absen Keluar
