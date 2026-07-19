@@ -23,7 +23,6 @@
             background-repeat: no-repeat;
             background-attachment: fixed;
 
-            /* OVERLAY GELAP BIAR TEKS JELAS */
             position: relative;
         }
         /* Overlay gelap di atas background */
@@ -34,7 +33,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.55); /* gelap 55% */
+            background: rgba(0, 0, 0, 0.55);
             z-index: 0;
         }
 
@@ -47,8 +46,8 @@
             width: 100%;
             animation: fadeIn 0.5s ease;
             position: relative;
-            z-index: 1; /* di atas overlay */
-            backdrop-filter: blur(2px); /* efek kaca */
+            z-index: 1;
+            backdrop-filter: blur(2px);
         }
 
         @keyframes fadeIn {
@@ -112,7 +111,12 @@
             width: 100%;
         }
         .btn:hover { transform: translateY(-2px); box-shadow: 0 5px 20px rgba(0,0,0,0.2); }
-        .btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+        .btn:disabled { 
+            opacity: 0.6; 
+            cursor: not-allowed; 
+            transform: none; 
+            pointer-events: none;
+        }
         .btn-hadir { background: linear-gradient(135deg, #27ae60, #2ecc71); }
         .btn-keluar { background: linear-gradient(135deg, #e74c3c, #c0392b); }
         .btn-izin { background: linear-gradient(135deg, #f39c12, #e67e22); }
@@ -181,7 +185,7 @@
         .message.success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; display: block; }
         .message.error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; display: block; }
 
-        /* ===== ADMIN ICON DENGAN LOGO KUSTOM ===== */
+        /* ===== ADMIN ICON ===== */
         .admin-icon {
             position: fixed;
             bottom: 20px;
@@ -225,6 +229,18 @@
             font-family: 'Poppins', sans-serif;
         }
         .admin-icon:hover .tooltip {
+            display: block;
+        }
+
+        /* ===== COOLDOWN INDICATOR ===== */
+        .cooldown-text {
+            text-align: center;
+            font-size: 12px;
+            color: #95a5a6;
+            margin-top: 8px;
+            display: none;
+        }
+        .cooldown-text.active {
             display: block;
         }
 
@@ -296,6 +312,7 @@
             <button type="button" class="btn btn-hadir" id="btnSubmit" onclick="submitAbsen()">
                 ✅ Kirim
             </button>
+            <div class="cooldown-text" id="cooldownText">⏳ Tunggu 5 detik sebelum kirim lagi...</div>
         </form>
 
         <div id="message" class="message"></div>
@@ -308,14 +325,19 @@
     </a>
 
     <script>
+        // =============================================
         // ============ VARIABEL ============
+        // =============================================
         let fotoData = null;
         let stream = null;
         let mode = 'masuk';
         let cameraActive = false;
         let fotoRequired = false;
+        let isCooldown = false;  // <-- CEK COOLDOWN
 
+        // =============================================
         // ============ UPDATE WAKTU ============
+        // =============================================
         function updateWaktu() {
             fetch('/get_waktu')
                 .then(r => r.json())
@@ -323,12 +345,14 @@
                     document.getElementById('tanggalDisplay').textContent = d.tanggal;
                     document.getElementById('jamDisplay').textContent = d.jam;
                 })
-                .catch(e => console.error(e));
+                .catch(e => console.error('Gagal ambil waktu:', e));
         }
         updateWaktu();
         setInterval(updateWaktu, 1000);
 
+        // =============================================
         // ============ UBAH MODE ============
+        // =============================================
         function ubahMode() {
             mode = document.getElementById('jenis').value;
             const ketGroup = document.getElementById('keteranganGroup');
@@ -347,10 +371,18 @@
             document.getElementById('btnKamera').classList.remove('hidden');
             document.getElementById('btnKamera').textContent = '📷 Buka Kamera';
             document.getElementById('btnKamera').className = 'btn btn-camera';
+            
             if (stream) {
                 stream.getTracks().forEach(t => t.stop());
                 stream = null;
                 cameraActive = false;
+            }
+
+            // Reset cooldown kalau lagi aktif
+            if (isCooldown) {
+                isCooldown = false;
+                document.getElementById('cooldownText').classList.remove('active');
+                btnSubmit.disabled = false;
             }
 
             if (mode === 'masuk') {
@@ -380,7 +412,9 @@
             }
         }
 
+        // =============================================
         // ============ KAMERA ============
+        // =============================================
         function startCamera() {
             const video = document.getElementById('video');
             const preview = document.getElementById('previewImg');
@@ -488,19 +522,29 @@
             }
         }
 
-        // ============ SUBMIT ============
+        // =============================================
+        // ============ SUBMIT (DENGAN COOLDOWN) ============
+        // =============================================
         function submitAbsen() {
+            // CEK COOLDOWN – cegah spam
+            if (isCooldown) {
+                showMessage('⏳ Tunggu 5 detik sebelum kirim lagi!', 'error');
+                return;
+            }
+
             const nama = document.getElementById('nama').value.trim();
             const jenis = document.getElementById('jenis').value;
             const keterangan = document.getElementById('keterangan').value.trim();
             const btnSubmit = document.getElementById('btnSubmit');
 
+            // Validasi nama
             if (!nama) {
                 showMessage('❌ Silakan masukkan nama!', 'error');
                 document.getElementById('nama').focus();
                 return;
             }
 
+            // Validasi foto untuk keluar & izin
             if (jenis === 'keluar' || jenis === 'izin') {
                 if (!fotoData) {
                     showMessage('📸 Wajib ambil foto terlebih dahulu!', 'error');
@@ -508,14 +552,19 @@
                 }
             }
 
+            // Validasi keterangan untuk izin
             if (jenis === 'izin' && !keterangan) {
                 showMessage('📝 Silakan isi keterangan!', 'error');
                 return;
             }
 
+            // ===== AKTIFKAN COOLDOWN =====
+            isCooldown = true;
             btnSubmit.disabled = true;
             btnSubmit.textContent = '⏳ Memproses...';
+            document.getElementById('cooldownText').classList.add('active');
 
+            // Siapkan request
             let url, formData = new FormData();
             formData.append('nama', nama);
 
@@ -525,12 +574,13 @@
             } else if (jenis === 'keluar') {
                 url = '/absen_keluar';
                 formData.append('foto', fotoData);
-            } else {
+            } else { // izin
                 url = '/izin';
                 formData.append('keterangan', keterangan);
                 formData.append('foto', fotoData);
             }
 
+            // Kirim request
             fetch(url, {
                 method: 'POST',
                 body: formData
@@ -539,6 +589,7 @@
             .then(data => {
                 if (data.status === 'success') {
                     showMessage(data.message, 'success');
+                    // Reset form
                     document.getElementById('nama').value = '';
                     document.getElementById('keterangan').value = '';
                     fotoData = null;
@@ -551,17 +602,50 @@
                 }
             })
             .catch(err => {
-                showMessage('❌ Terjadi kesalahan!', 'error');
+                showMessage('❌ Terjadi kesalahan! Coba lagi.', 'error');
                 console.error(err);
             })
             .finally(() => {
-                btnSubmit.disabled = false;
-                if (jenis === 'masuk') btnSubmit.textContent = '✅ Absen Masuk';
-                else if (jenis === 'keluar') btnSubmit.textContent = '🚪 Absen Keluar';
-                else btnSubmit.textContent = '📝 Kirim Izin';
+                // Mulai cooldown 5 detik
+                startCooldown();
             });
         }
 
+        // =============================================
+        // ============ COOLDOWN 5 DETIK ============
+        // =============================================
+        function startCooldown() {
+            const btnSubmit = document.getElementById('btnSubmit');
+            const cooldownText = document.getElementById('cooldownText');
+            let timer = 5;
+
+            btnSubmit.disabled = true;
+            btnSubmit.textContent = '⏳ Tunggu ' + timer + 's';
+            cooldownText.textContent = '⏳ Tunggu ' + timer + ' detik sebelum kirim lagi...';
+            cooldownText.classList.add('active');
+
+            const interval = setInterval(() => {
+                timer--;
+                if (timer > 0) {
+                    btnSubmit.textContent = '⏳ Tunggu ' + timer + 's';
+                    cooldownText.textContent = '⏳ Tunggu ' + timer + ' detik sebelum kirim lagi...';
+                } else {
+                    clearInterval(interval);
+                    // Selesai cooldown
+                    isCooldown = false;
+                    btnSubmit.disabled = false;
+                    cooldownText.classList.remove('active');
+                    // Kembalikan teks tombol sesuai mode
+                    if (mode === 'masuk') btnSubmit.textContent = '✅ Absen Masuk';
+                    else if (mode === 'keluar') btnSubmit.textContent = '🚪 Absen Keluar';
+                    else btnSubmit.textContent = '📝 Kirim Izin';
+                }
+            }, 1000);
+        }
+
+        // =============================================
+        // ============ SHOW MESSAGE ============
+        // =============================================
         function showMessage(msg, type) {
             const div = document.getElementById('message');
             div.textContent = msg;
@@ -570,9 +654,12 @@
             window.msgTimeout = setTimeout(() => {
                 div.className = 'message';
                 div.textContent = '';
-            }, 6000);
+            }, 5000);
         }
 
+        // =============================================
+        // ============ ENTER ============
+        // =============================================
         document.getElementById('nama').addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 e.preventDefault();
@@ -580,6 +667,9 @@
             }
         });
 
+        // =============================================
+        // ============ INISIALISASI ============
+        // =============================================
         ubahMode();
     </script>
 </body>
