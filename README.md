@@ -4,16 +4,15 @@ Aplikasi web sederhana untuk absensi harian dengan jam otomatis.
 
 ## ✨ Fitur
 
-- ⏰ Jam Real-time: Menampilkan tanggal dan jam yang update otomatis
-- ✅ Absen Masuk: Mencatat waktu masuk karyawan
-- 🚪 Absen Keluar: Mencatat waktu keluar karyawan
-- 📊 Lihat Data: Menampilkan semua data absen dalam tabel
-- 💾 Penyimpanan: Data tersimpan dalam file JSON
-- 📱 Responsive: Bisa diakses dari HP, tablet, atau desktop
+- ⏰ Jam Real-time
+- ✅ Absen Masuk
+- 🚪 Absen Keluar
+- 📊 Lihat Data
+- 💾 Penyimpanan JSON
+- 📱 Responsive
 
 ## 🚀 Cara Menjalankan
 
-### 1. Clone Repository
+### Install Dependencies
 ```bash
-git clone https://github.com/username/absen-harian-web.git
-cd absen-harian-web
+pip install flask
