@@ -6,7 +6,7 @@ import base64
 from functools import wraps
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import A4, landscape
-from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import inch
 import io
@@ -15,9 +15,9 @@ app = Flask(__name__)
 app.secret_key = 'rahasia_admin_absen_12345'
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max
 
-# ============ KONFIGURASI LOGIN ============
+# Konfigurasi login
 ADMIN_USERNAME = 'admin'
-ADMIN_PASSWORD = 'anakanakkesayanganbapak'
+ADMIN_PASSWORD = 'admin123'
 
 DATA_FILE = 'data_absen.json'
 
@@ -45,7 +45,7 @@ def login_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
-# ============ ROUTE HALAMAN ============
+# ============ ROUTE ============
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -70,8 +70,7 @@ def login():
 
 @app.route('/logout')
 def logout():
-    """Logout admin - Hapus semua session"""
-    session.clear()  # <-- PERBAIKAN: Hapus semua session
+    session.pop('logged_in', None)
     return redirect(url_for('login'))
 
 # ============ API ABSEN ============
@@ -363,7 +362,6 @@ def get_waktu():
         'jam': now.strftime("%H:%M:%S")
     })
 
-# ============ JALANKAN APLIKASI ============
 if __name__ == '__main__':
     init_data_file()
     app.run(debug=True, host='0.0.0.0', port=5000)
