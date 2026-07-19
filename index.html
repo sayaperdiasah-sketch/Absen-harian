@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Form Absen Harian</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            color: #2c3e50;
+            font-weight: 700;
+        }
+
+        .header .subtitle {
+            font-size: 14px;
+            color: #7f8c8d;
+            margin-top: 5px;
+        }
+
+        .waktu-box {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .waktu-box .tanggal {
+            font-size: 16px;
+            color: #34495e;
+            font-weight: 600;
+        }
+
+        .waktu-box .jam {
+            font-size: 32px;
+            color: #e74c3c;
+            font-weight: 700;
+            margin-top: 5px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 14px 20px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Poppins', sans-serif;
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-masuk {
+            background: linear-gradient(135deg, #27ae60, #2ecc71);
+        }
+
+        .btn-masuk:hover {
+            background: linear-gradient(135deg, #229954, #27ae60);
+        }
+
+        .btn-keluar {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+        }
+
+        .btn-keluar:hover {
+            background: linear-gradient(135deg, #c0392b, #e74c3c);
+        }
+
+        .btn-lihat {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            width: 100%;
+            padding: 12px;
+        }
+
+        .btn-lihat:hover {
+            background: linear-gradient(135deg, #2980b9, #3498db);
+        }
+
+        .message {
+            padding: 12px 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+            display: none;
+            font-weight: 500;
+        }
+
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            display: block;
+        }
+
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            display: block;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.6);
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-content {
+            background: white;
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: 20px;
+            max-width: 800px;
+            max-height: 80vh;
+            overflow-y: auto;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #ecf0f1;
+        }
+
+        .modal-header h2 {
+            color: #2c3e50;
+            font-size: 24px;
+        }
+
+        .modal-close {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .modal-close:hover {
+            transform: rotate(90deg);
+            background: #c0392b;
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        table th {
+            background: #34495e;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            position: sticky;
+            top: 0;
+        }
+
+        table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #ecf0f1;
+        }
+
+        table tr:hover {
+            background: #f8f9fa;
+        }
+
+        table tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 40px 20px;
+            color: #7f8c8d;
+            font-size: 16px;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+
+            .header h1 {
+                font-size: 22px;
+            }
+
+            .waktu-box .jam {
+                font-size: 26px;
+            }
+
+            .btn-group {
+                flex-direction: column;
+            }
+
+            .modal-content {
+                margin: 10% 10px;
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📋 Absen Harian</h1>
+            <div class="subtitle">Sistem Absensi Online</div>
+        </div>
+
+        <div class="waktu-box">
+            <div class="tanggal" id="tanggalDisplay">Memuat tanggal...</div>
+            <div class="jam" id="jamDisplay">--:--:--</div>
+        </div>
+
+        <form id="absenForm">
+            <div class="form-group">
+                <label for="nama">👤 Nama Lengkap</label>
+                <input type="text" id="nama" placeholder="Masukkan nama lengkap..." required>
+            </div>
+
+            <div class="btn-group">
+                <button type="button" class="btn btn-masuk" onclick="absen('masuk')">
+                    ✅ Absen Masuk
+                </button>
+                <button type="button" class="btn btn-keluar" onclick="absen('keluar')">
+                    🚪 Absen Keluar
+                </button>
+            </div>
+
+            <button type="button" class="btn btn-lihat" onclick="lihatData()">
+                📊 Lihat Data Absen
+            </button>
+        </form>
+
+        <div id="message" class="message"></div>
+    </div>
+
+    <!-- Modal Lihat Data -->
+    <div id="dataModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>📊 Data Absen</h2>
+                <button class="modal-close" onclick="tutupModal()">✕</button>
+            </div>
+            <div class="table-container" id="dataContainer">
+                <div class="loading" style="margin: 20px auto; display: block;"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Update waktu setiap detik
+        function updateWaktu() {
+            fetch('/get_waktu')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('tanggalDisplay').textContent = data.tanggal;
+                    document.getElementById('jamDisplay').textContent = data.jam;
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        }
+
+        updateWaktu();
+        setInterval(updateWaktu, 1000);
+
+        // Fungsi absen
+        function absen(tipe) {
+            const nama = document.getElementById('nama').value.trim();
+            const messageDiv = document.getElementById('message');
+
+            if (!nama) {
+                showMessage('❌ Silakan masukkan nama terlebih dahulu!', 'error');
+                document.getElementById('nama').focus();
+                return;
+            }
+
+            document.querySelectorAll('.btn').forEach(btn => btn.disabled = true);
+
+            const url = tipe === 'masuk' ? '/absen_masuk' : '/absen_keluar';
+            const formData = new FormData();
+            formData.append('nama', nama);
+
+            fetch(url, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    showMessage(data.message, 'success');
+                    document.getElementById('nama').value = '';
+                    document.getElementById('nama').focus();
+                } else {
+                    showMessage(data.message, 'error');
+                }
+            })
+            .catch(error => {
+                showMessage('❌ Terjadi kesalahan. Silakan coba lagi.', 'error');
+                console.error('Error:', error);
+            })
+            .finally(() => {
+                document.querySelectorAll('.btn').forEach(btn => btn.disabled = false);
+            });
+        }
+
+        function showMessage(message, type) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.textContent = message;
+            messageDiv.className = 'message ' + type;
+            
+            clearTimeout(window.messageTimeout);
+            window.messageTimeout = setTimeout(() => {
+                messageDiv.className = 'message';
+                messageDiv.textContent = '';
+            }, 5000);
+        }
+
+        // Fungsi lihat data
+        function lihatData() {
+            const modal = document.getElementById('dataModal');
+            const container = document.getElementById('dataContainer');
+            
+            modal.style.display = 'block';
+            container.innerHTML = '<div class="loading" style="margin: 20px auto; display: block;"></div>';
+
+            fetch('/get_data')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.length === 0) {
+                        container.innerHTML = '<div class="no-data">📭 Belum ada data absen</div>';
+                        return;
+                    }
+
+                    let html = `
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>No</th>
+                                    <th>Nama</th>
+                                    <th>Tanggal</th>
+                                    <th>Jam Masuk</th>
+                                    <th>Jam Keluar</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                    `;
+
+                    data.forEach((item, index) => {
+                        html += `
+                            <tr>
+                                <td>${index + 1}</td>
+                                <td>${item.nama}</td>
+                                <td>${item.tanggal}</td>
+                                <td>${item.jam_masuk}</td>
+                                <td>${item.jam_keluar}</td>
+                            </tr>
+                        `;
+                    });
+
+                    html += `
+                            </tbody>
+                        </table>
+                    `;
+
+                    container.innerHTML = html;
+                })
+                .catch(error => {
+                    container.innerHTML = '<div class="no-data">❌ Gagal memuat data</div>';
+                    console.error('Error:', error);
+                });
+        }
+
+        function tutupModal() {
+            document.getElementById('dataModal').style.display = 'none';
+        }
+
+        window.onclick = function(event) {
+            const modal = document.getElementById('dataModal');
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        }
+
+        document.getElementById('nama').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                absen('masuk');
+            }
+        });
+    </script>
+</body>
+</html>
