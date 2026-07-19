@@ -6,7 +6,7 @@ import base64
 from functools import wraps
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import A4, landscape
-from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import inch
 import io
@@ -15,9 +15,9 @@ app = Flask(__name__)
 app.secret_key = 'rahasia_admin_absen_12345'
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max
 
-# Konfigurasi login
+# ============ KONFIGURASI LOGIN ============
 ADMIN_USERNAME = 'admin'
-ADMIN_PASSWORD = 'admin123'
+ADMIN_PASSWORD = 'anakanakkesayanganbapak'
 
 DATA_FILE = 'data_absen.json'
 
@@ -30,7 +30,10 @@ def init_data_file():
 def load_data():
     init_data_file()
     with open(DATA_FILE, 'r') as f:
-        return json.load(f)
+        try:
+            return json.load(f)
+        except:
+            return []
 
 def save_data(data):
     with open(DATA_FILE, 'w') as f:
@@ -45,7 +48,7 @@ def login_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
-# ============ ROUTE ============
+# ============ ROUTE HALAMAN ============
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -53,8 +56,7 @@ def index():
 @app.route('/admin')
 @login_required
 def admin():
-    data = load_data()
-    return render_template('admin.html', data=data)
+    return render_template('admin.html')
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -70,7 +72,7 @@ def login():
 
 @app.route('/logout')
 def logout():
-    session.pop('logged_in', None)
+    session.clear()
     return redirect(url_for('login'))
 
 # ============ API ABSEN ============
@@ -85,7 +87,7 @@ def absen_masuk():
     today = datetime.now().strftime("%d-%m-%Y")
     
     for item in data:
-        if item['nama'].lower() == nama.lower() and item['tanggal'] == today and item.get('status') == 'Hadir':
+        if item.get('nama', '').lower() == nama.lower() and item.get('tanggal', '') == today and item.get('status') == 'Hadir':
             return jsonify({'status': 'error', 'message': f'{nama} sudah absen masuk hari ini!'})
     
     now = datetime.now()
@@ -112,7 +114,7 @@ def absen_masuk():
 @app.route('/absen_keluar', methods=['POST'])
 def absen_keluar():
     nama = request.form.get('nama', '').strip()
-    foto = request.form.get('foto', '')  # base64
+    foto = request.form.get('foto', '')
     
     if not nama:
         return jsonify({'status': 'error', 'message': 'Nama tidak boleh kosong!'})
@@ -125,10 +127,10 @@ def absen_keluar():
     found = False
     
     for item in data:
-        if (item['nama'].lower() == nama.lower() and 
-            item['tanggal'] == today and 
+        if (item.get('nama', '').lower() == nama.lower() and 
+            item.get('tanggal', '') == today and 
             item.get('status') == 'Hadir' and
-            item['jam_keluar'] == '-'):
+            item.get('jam_keluar') == '-'):
             item['jam_keluar'] = datetime.now().strftime("%H:%M:%S")
             item['foto_keluar'] = foto
             found = True
@@ -164,9 +166,8 @@ def izin():
     data = load_data()
     today = datetime.now().strftime("%d-%m-%Y")
     
-    # Cek apakah sudah izin hari ini
     for item in data:
-        if item['nama'].lower() == nama.lower() and item['tanggal'] == today and item.get('status') in ['Izin', 'Sakit', 'Dinas']:
+        if item.get('nama', '').lower() == nama.lower() and item.get('tanggal', '') == today and item.get('status') in ['Izin', 'Sakit', 'Dinas']:
             return jsonify({'status': 'error', 'message': f'{nama} sudah mengajukan {item.get("status")} hari ini!'})
     
     now = datetime.now()
@@ -187,28 +188,43 @@ def izin():
     
     return jsonify({
         'status': 'success',
-        'message': f'✅ {nama} - Izin berhasil dicatat!\n📝 {keterangan}'
+        'message': f'✅ {nama} - Izin berhasil dicatat!'
     })
 
 # ============ API ADMIN ============
 @app.route('/api/data')
 @login_required
 def api_get_data():
+    """Ambil data untuk tabel (tanpa foto besar)"""
     data = load_data()
-    # Hapus data foto besar untuk kecepatan
     for item in data:
-        if 'foto_masuk' in item and item['foto_masuk']:
-            item['foto_masuk'] = 'Ada Foto' if len(str(item['foto_masuk'])) > 100 else None
-        if 'foto_keluar' in item and item['foto_keluar']:
-            item['foto_keluar'] = 'Ada Foto' if len(str(item['foto_keluar'])) > 100 else None
+        if 'foto_masuk' in item:
+            item['foto_masuk'] = 'Ada' if item['foto_masuk'] and len(str(item['foto_masuk'])) > 100 else None
+        if 'foto_keluar' in item:
+            item['foto_keluar'] = 'Ada' if item['foto_keluar'] and len(str(item['foto_keluar'])) > 100 else None
     return jsonify(data)
 
 @app.route('/api/data/full')
 @login_required
 def api_get_data_full():
-    """Ambil data lengkap dengan foto"""
-    data = load_data()
-    return jsonify(data)
+    """Ambil data lengkap dengan foto (untuk admin)"""
+    try:
+        data = load_data()
+        # Pastikan setiap item punya field yang dibutuhkan
+        for item in data:
+            if 'id' not in item:
+                item['id'] = str(int(datetime.now().timestamp()))
+            if 'status' not in item:
+                item['status'] = 'Hadir'
+            if 'keterangan' not in item:
+                item['keterangan'] = '-'
+            if 'foto_masuk' not in item:
+                item['foto_masuk'] = None
+            if 'foto_keluar' not in item:
+                item['foto_keluar'] = None
+        return jsonify(data)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 @app.route('/api/data/filter')
 @login_required
@@ -219,11 +235,11 @@ def api_filter_data():
     status = request.args.get('status', '')
     
     if tanggal:
-        data = [d for d in data if d['tanggal'] == tanggal]
+        data = [d for d in data if d.get('tanggal', '') == tanggal]
     if nama:
-        data = [d for d in data if nama in d['nama'].lower()]
+        data = [d for d in data if nama in d.get('nama', '').lower()]
     if status:
-        data = [d for d in data if d['status'] == status]
+        data = [d for d in data if d.get('status', '') == status]
     
     return jsonify(data)
 
@@ -231,7 +247,7 @@ def api_filter_data():
 @login_required
 def api_delete_data(id):
     data = load_data()
-    data = [d for d in data if d['id'] != id]
+    data = [d for d in data if d.get('id', '') != id]
     save_data(data)
     return jsonify({'status': 'success', 'message': 'Data berhasil dihapus!'})
 
@@ -252,7 +268,7 @@ def api_update_data(id):
     new_keterangan = request.json.get('keterangan')
     
     for item in data:
-        if item['id'] == id:
+        if item.get('id', '') == id:
             if new_nama:
                 item['nama'] = new_nama
             if new_jam_masuk:
@@ -308,10 +324,10 @@ def export_pdf():
     for idx, item in enumerate(data, 1):
         table_data.append([
             str(idx),
-            item['nama'],
-            item['tanggal'],
-            item['jam_masuk'],
-            item['jam_keluar'],
+            item.get('nama', '-'),
+            item.get('tanggal', '-'),
+            item.get('jam_masuk', '-'),
+            item.get('jam_keluar', '-'),
             item.get('status', 'Hadir'),
             item.get('keterangan', '-')
         ])
@@ -362,6 +378,7 @@ def get_waktu():
         'jam': now.strftime("%H:%M:%S")
     })
 
+# ============ JALANKAN APLIKASI ============
 if __name__ == '__main__':
     init_data_file()
     app.run(debug=True, host='0.0.0.0', port=5000)
