@@ -173,7 +173,7 @@ def izin():
     if not keterangan:
         return jsonify({'status': 'error', 'message': '📝 Silakan isi keterangan!'})
     if not foto:
-        return jsonify({'status': 'error', 'message': '📸 Harap ambil foto!'})https://absen-harian-production.up.railway.app/admin
+        return jsonify({'status': 'error', 'message': '📸 Harap ambil foto!'})  # <-- SUDAH DIPERBAIKI
     
     data = load_data()
     today = datetime.now().strftime("%d-%m-%Y")
