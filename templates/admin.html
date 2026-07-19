@@ -11,8 +11,9 @@
             font-family: 'Poppins', sans-serif;
             background: #f0f2f5;
             padding: 20px;
+            min-height: 100vh;
         }
-        .container { max-width: 1300px; margin: 0 auto; }
+        .container { max-width: 1200px; margin: 0 auto; }
         
         /* HEADER */
         .header {
@@ -50,59 +51,122 @@
         .btn-outline { background: transparent; border: 2px solid white; }
         .btn-sm { padding: 5px 12px; font-size: 12px; }
         .btn-purple { background: #8e44ad; }
+        .btn-info { background: #1abc9c; }
         
-        /* STATS */
-        .stats {
+        /* ===== DAFTAR TANGGAL ===== */
+        .tanggal-list {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
             gap: 15px;
             margin-bottom: 25px;
         }
-        .stat-card {
-            background: white;
-            padding: 18px;
-            border-radius: 12px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-            text-align: center;
-        }
-        .stat-card .number { font-size: 28px; font-weight: 700; color: #2c3e50; }
-        .stat-card .label { color: #7f8c8d; font-size: 12px; margin-top: 3px; }
-        .stat-card .icon { font-size: 24px; display: block; margin-bottom: 5px; }
         
-        /* FILTER */
-        .filter-section {
+        .tanggal-card {
             background: white;
-            padding: 15px 20px;
-            border-radius: 12px;
-            margin-bottom: 20px;
-            display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
-            align-items: end;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-        }
-        .filter-section .form-group { display: flex; flex-direction: column; gap: 4px; }
-        .filter-section label { font-size: 12px; font-weight: 600; color: #2c3e50; }
-        .filter-section input, .filter-section select {
-            padding: 8px 12px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            font-family: 'Poppins', sans-serif;
-            font-size: 13px;
-            background: white;
-        }
-        .filter-section input:focus, .filter-section select:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-        
-        /* TABEL */
-        .table-container {
-            background: white;
-            border-radius: 12px;
+            border-radius: 15px;
             padding: 20px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.08);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-left: 5px solid #3498db;
+            position: relative;
+        }
+        .tanggal-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+        }
+        .tanggal-card.active {
+            border-left-color: #e74c3c;
+            background: #f8f9fa;
+        }
+        .tanggal-card .tanggal-text {
+            font-size: 18px;
+            font-weight: 700;
+            color: #2c3e50;
+        }
+        .tanggal-card .tanggal-hari {
+            font-size: 13px;
+            color: #7f8c8d;
+        }
+        .tanggal-card .ringkasan {
+            display: flex;
+            gap: 15px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+        .tanggal-card .ringkasan .item {
+            font-size: 12px;
+            background: #f0f2f5;
+            padding: 4px 12px;
+            border-radius: 20px;
+        }
+        .tanggal-card .ringkasan .item .num {
+            font-weight: 700;
+            font-size: 14px;
+        }
+        .tanggal-card .badge-total {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: #3498db;
+            color: white;
+            padding: 3px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .tanggal-card .badge-total.izin { background: #f39c12; }
+        .tanggal-card .badge-total.hadir { background: #27ae60; }
+        
+        .no-tanggal {
+            text-align: center;
+            padding: 40px;
+            color: #7f8c8d;
+            grid-column: 1 / -1;
+        }
+        
+        /* ===== DETAIL TANGGAL ===== */
+        .detail-section {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.08);
+            display: none;
+        }
+        .detail-section.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .detail-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #ecf0f1;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .detail-header h2 {
+            font-size: 20px;
+            color: #2c3e50;
+        }
+        .detail-header .sub-info {
+            font-size: 13px;
+            color: #7f8c8d;
+        }
+        .detail-header .sub-info span {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .table-container {
             overflow-x: auto;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
         }
         table { width: 100%; border-collapse: collapse; font-size: 13px; }
         table th {
@@ -133,9 +197,9 @@
         
         .action-btns { display: flex; gap: 5px; flex-wrap: wrap; }
         
-        .no-data { text-align: center; padding: 40px; color: #7f8c8d; }
+        .no-data { text-align: center; padding: 30px; color: #7f8c8d; }
         
-        /* MODAL */
+        /* ===== MODAL ===== */
         .modal {
             display: none;
             position: fixed;
@@ -162,10 +226,6 @@
             from { transform: translateY(-30px); opacity: 0; }
             to { transform: translateY(0); opacity: 1; }
         }
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
         .modal-content h2 { margin-bottom: 20px; color: #2c3e50; font-size: 20px; }
         .modal-content .form-group { margin-bottom: 14px; }
         .modal-content label { display: block; font-weight: 600; font-size: 13px; color: #2c3e50; margin-bottom: 4px; }
@@ -181,7 +241,6 @@
         .modal-content .btn-group-modal { display: flex; gap: 10px; margin-top: 20px; }
         .modal-content .btn-group-modal .btn { flex: 1; text-align: center; }
         
-        /* MODAL FOTO */
         .foto-modal-content {
             max-width: 500px;
             text-align: center;
@@ -193,13 +252,23 @@
             margin: 10px 0;
         }
         
+        .back-btn {
+            display: inline-block;
+            margin-bottom: 15px;
+            color: #3498db;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        .back-btn:hover { text-decoration: underline; }
+        
+        /* ===== RESPONSIVE ===== */
         @media (max-width: 768px) {
             .header { flex-direction: column; text-align: center; }
             .header-actions { justify-content: center; }
-            .stats { grid-template-columns: 1fr 1fr; }
-            .filter-section { flex-direction: column; }
-            .filter-section .form-group { width: 100%; }
-            .filter-section input, .filter-section select { width: 100%; }
+            .tanggal-list { grid-template-columns: 1fr; }
+            .tanggal-card .ringkasan { gap: 8px; }
+            .detail-header { flex-direction: column; text-align: center; }
         }
     </style>
 </head>
@@ -216,75 +285,44 @@
             </div>
         </div>
         
-        <!-- STATS -->
-        <div class="stats" id="statsContainer">
-            <div class="stat-card">
-                <span class="icon">📋</span>
-                <div class="number" id="totalData">0</div>
-                <div class="label">Total Data</div>
-            </div>
-            <div class="stat-card">
-                <span class="icon">✅</span>
-                <div class="number" id="totalHadir">0</div>
-                <div class="label">Hadir</div>
-            </div>
-            <div class="stat-card">
-                <span class="icon">🚪</span>
-                <div class="number" id="totalPulang">0</div>
-                <div class="label">Pulang</div>
-            </div>
-            <div class="stat-card">
-                <span class="icon">📝</span>
-                <div class="number" id="totalIzin">0</div>
-                <div class="label">Izin/Sakit/Dinas</div>
+        <!-- DAFTAR TANGGAL -->
+        <div id="tanggalContainer">
+            <div class="tanggal-list" id="tanggalList">
+                <div class="no-tanggal">⏳ Memuat data...</div>
             </div>
         </div>
         
-        <!-- FILTER -->
-        <div class="filter-section">
-            <div class="form-group">
-                <label>📅 Tanggal</label>
-                <input type="date" id="filterTanggal" onchange="loadData()">
+        <!-- DETAIL TANGGAL -->
+        <div class="detail-section" id="detailSection">
+            <div class="detail-header">
+                <div>
+                    <span class="back-btn" onclick="kembaliKeDaftar()">← Kembali ke daftar</span>
+                    <h2 id="detailTanggal">📅 Tanggal</h2>
+                </div>
+                <div class="sub-info" id="detailInfo">
+                    Total: <span id="detailTotal">0</span> data
+                </div>
             </div>
-            <div class="form-group">
-                <label>🔍 Nama</label>
-                <input type="text" id="filterNama" placeholder="Cari nama..." onkeyup="loadData()">
+            
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>Nama</th>
+                            <th>Jam Masuk</th>
+                            <th>Jam Keluar</th>
+                            <th>Status</th>
+                            <th>Keterangan</th>
+                            <th>Foto</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="detailBody">
+                        <tr><td colspan="8" class="no-data">📭 Tidak ada data</td></tr>
+                    </tbody>
+                </table>
             </div>
-            <div class="form-group">
-                <label>📌 Status</label>
-                <select id="filterStatus" onchange="loadData()">
-                    <option value="">Semua</option>
-                    <option value="Hadir">Hadir</option>
-                    <option value="Pulang">Pulang</option>
-                    <option value="Izin">Izin</option>
-                    <option value="Sakit">Sakit</option>
-                    <option value="Dinas">Dinas</option>
-                </select>
-            </div>
-            <button class="btn btn-primary" onclick="resetFilter()">↺ Reset</button>
-            <button class="btn btn-success" onclick="refreshData()">🔄 Refresh</button>
-        </div>
-        
-        <!-- TABEL -->
-        <div class="table-container">
-            <table>
-                <thead>
-                    <tr>
-                        <th>No</th>
-                        <th>Nama</th>
-                        <th>Tanggal</th>
-                        <th>Jam Masuk</th>
-                        <th>Jam Keluar</th>
-                        <th>Status</th>
-                        <th>Keterangan</th>
-                        <th>Foto</th>
-                        <th>Aksi</th>
-                    </tr>
-                </thead>
-                <tbody id="tableBody">
-                    <tr><td colspan="9" class="no-data">⏳ Memuat data...</td></tr>
-                </tbody>
-            </table>
         </div>
     </div>
     
@@ -341,49 +379,131 @@
     </div>
 
     <script>
-        let currentFotoData = null;
         let allData = [];
+        let currentTanggal = '';
+        let currentFotoData = null;
+        let dataPerTanggal = {};
 
         // ============ LOAD DATA ============
         function loadData() {
-            const tanggal = document.getElementById('filterTanggal').value;
-            const nama = document.getElementById('filterNama').value;
-            const status = document.getElementById('filterStatus').value;
-            
-            let url = '/api/data/full?';
-            if (tanggal) url += `tanggal=${tanggal}&`;
-            if (nama) url += `nama=${nama}&`;
-            if (status) url += `status=${status}&`;
-            
-            fetch(url)
+            fetch('/api/data/full')
                 .then(res => res.json())
                 .then(data => {
                     allData = data;
-                    renderTable(data);
-                    updateStats(data);
+                    groupByTanggal(data);
+                    renderTanggalList();
                 })
                 .catch(err => {
-                    document.getElementById('tableBody').innerHTML = '<tr><td colspan="9" class="no-data">❌ Gagal memuat data</td></tr>';
+                    document.getElementById('tanggalList').innerHTML = '<div class="no-tanggal">❌ Gagal memuat data</div>';
                     console.error(err);
                 });
         }
 
-        // ============ RENDER TABEL ============
-        function renderTable(data) {
-            const tbody = document.getElementById('tableBody');
+        // ============ GROUP BY TANGGAL ============
+        function groupByTanggal(data) {
+            dataPerTanggal = {};
+            data.forEach(item => {
+                const tgl = item.tanggal;
+                if (!dataPerTanggal[tgl]) {
+                    dataPerTanggal[tgl] = [];
+                }
+                dataPerTanggal[tgl].push(item);
+            });
             
-            if (!data || data.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="9" class="no-data">📭 Belum ada data</td></tr>';
+            // Urutkan tanggal dari yang terbaru
+            const sortedKeys = Object.keys(dataPerTanggal).sort((a, b) => {
+                const [d1, m1, y1] = a.split('-');
+                const [d2, m2, y2] = b.split('-');
+                return new Date(y2, m2-1, d2) - new Date(y1, m1-1, d1);
+            });
+            
+            const sorted = {};
+            sortedKeys.forEach(key => {
+                sorted[key] = dataPerTanggal[key];
+            });
+            dataPerTanggal = sorted;
+        }
+
+        // ============ RENDER DAFTAR TANGGAL ============
+        function renderTanggalList() {
+            const container = document.getElementById('tanggalList');
+            const keys = Object.keys(dataPerTanggal);
+            
+            if (keys.length === 0) {
+                container.innerHTML = '<div class="no-tanggal">📭 Belum ada data absen</div>';
                 return;
             }
             
             let html = '';
-            data.forEach((item, idx) => {
+            keys.forEach(tgl => {
+                const items = dataPerTanggal[tgl];
+                const total = items.length;
+                const hadir = items.filter(d => d.status === 'Hadir' || d.status === '-').length;
+                const pulang = items.filter(d => d.status === 'Pulang').length;
+                const izin = items.filter(d => ['Izin','Sakit','Dinas'].includes(d.status)).length;
+                
+                // Nama hari
+                const hariMap = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+                const [d, m, y] = tgl.split('-');
+                const dateObj = new Date(y, m-1, d);
+                const hari = hariMap[dateObj.getDay()];
+                
+                html += `
+                    <div class="tanggal-card" onclick="pilihTanggal('${tgl}')">
+                        <div class="tanggal-text">${tgl}</div>
+                        <div class="tanggal-hari">${hari}</div>
+                        <div class="ringkasan">
+                            <span class="item">✅ <span class="num">${hadir}</span> Hadir</span>
+                            <span class="item">🚪 <span class="num">${pulang}</span> Pulang</span>
+                            <span class="item">📝 <span class="num">${izin}</span> Izin</span>
+                            <span class="item">📋 <span class="num">${total}</span> Total</span>
+                        </div>
+                        <span class="badge-total">${total} data</span>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+
+        // ============ PILIH TANGGAL ============
+        function pilihTanggal(tgl) {
+            currentTanggal = tgl;
+            const items = dataPerTanggal[tgl] || [];
+            
+            // Sembunyikan daftar tanggal
+            document.getElementById('tanggalContainer').style.display = 'none';
+            
+            // Tampilkan detail
+            const detail = document.getElementById('detailSection');
+            detail.classList.add('active');
+            
+            // Update header
+            document.getElementById('detailTanggal').textContent = `📅 ${tgl}`;
+            document.getElementById('detailTotal').textContent = items.length;
+            
+            // Render tabel detail
+            renderDetail(items);
+            
+            // Scroll ke detail
+            detail.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        // ============ RENDER DETAIL ============
+        function renderDetail(items) {
+            const tbody = document.getElementById('detailBody');
+            
+            if (!items || items.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" class="no-data">📭 Tidak ada data</td></tr>';
+                return;
+            }
+            
+            let html = '';
+            items.forEach((item, idx) => {
                 const status = item.status || 'Hadir';
                 const badgeClass = getBadgeClass(status);
                 const ket = item.keterangan || '-';
                 
-                // Cek ada foto
                 let fotoHtml = '-';
                 if (item.foto_masuk && item.foto_masuk.length > 100) {
                     fotoHtml = `<button class="btn btn-primary btn-sm" onclick="lihatFoto('${item.foto_masuk}')">📷</button>`;
@@ -395,7 +515,6 @@
                     <tr>
                         <td>${idx + 1}</td>
                         <td><strong>${item.nama}</strong></td>
-                        <td>${item.tanggal}</td>
                         <td>${item.jam_masuk}</td>
                         <td>${item.jam_keluar}</td>
                         <td><span class="badge ${badgeClass}">${status}</span></td>
@@ -424,29 +543,11 @@
             return map[status] || 'badge-hadir';
         }
 
-        // ============ UPDATE STATS ============
-        function updateStats(data) {
-            const total = data.length;
-            const hadir = data.filter(d => d.status === 'Hadir' || d.status === '-').length;
-            const pulang = data.filter(d => d.status === 'Pulang').length;
-            const izin = data.filter(d => ['Izin','Sakit','Dinas'].includes(d.status)).length;
-            
-            document.getElementById('totalData').textContent = total;
-            document.getElementById('totalHadir').textContent = hadir;
-            document.getElementById('totalPulang').textContent = pulang;
-            document.getElementById('totalIzin').textContent = izin;
-        }
-
-        // ============ FILTER ============
-        function resetFilter() {
-            document.getElementById('filterTanggal').value = '';
-            document.getElementById('filterNama').value = '';
-            document.getElementById('filterStatus').value = '';
-            loadData();
-        }
-
-        function refreshData() {
-            loadData();
+        // ============ KEMBALI KE DAFTAR ============
+        function kembaliKeDaftar() {
+            document.getElementById('tanggalContainer').style.display = 'block';
+            document.getElementById('detailSection').classList.remove('active');
+            renderTanggalList();
         }
 
         // ============ DELETE ============
@@ -455,7 +556,17 @@
             
             fetch(`/api/data/delete/${id}`, { method: 'DELETE' })
                 .then(res => res.json())
-                .then(() => loadData())
+                .then(() => {
+                    loadData();
+                    // Jika sedang melihat detail, refresh detail
+                    if (currentTanggal && document.getElementById('detailSection').classList.contains('active')) {
+                        setTimeout(() => {
+                            const items = dataPerTanggal[currentTanggal] || [];
+                            renderDetail(items);
+                            document.getElementById('detailTotal').textContent = items.length;
+                        }, 500);
+                    }
+                })
                 .catch(err => alert('Gagal menghapus!'));
         }
 
@@ -465,7 +576,10 @@
             
             fetch('/api/data/delete_all', { method: 'DELETE' })
                 .then(res => res.json())
-                .then(() => loadData())
+                .then(() => {
+                    loadData();
+                    kembaliKeDaftar();
+                })
                 .catch(err => alert('Gagal menghapus!'));
         }
 
@@ -504,6 +618,14 @@
             .then(() => {
                 closeModal('editModal');
                 loadData();
+                // Refresh detail jika sedang aktif
+                if (currentTanggal && document.getElementById('detailSection').classList.contains('active')) {
+                    setTimeout(() => {
+                        const items = dataPerTanggal[currentTanggal] || [];
+                        renderDetail(items);
+                        document.getElementById('detailTotal').textContent = items.length;
+                    }, 500);
+                }
                 alert('✅ Data berhasil diupdate!');
             })
             .catch(err => alert('Gagal update!'));
@@ -533,7 +655,6 @@
             document.getElementById(id).classList.remove('active');
         }
 
-        // Tutup modal klik di luar
         window.onclick = function(event) {
             document.querySelectorAll('.modal').forEach(modal => {
                 if (event.target === modal) {
