@@ -7,35 +7,61 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
+
         body {
             font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
             padding: 15px;
+
+            /* === BACKGROUND DENGAN FOTO === */
+            background-image: url("{{ url_for('static', filename='bg-absen.jpg') }}");
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+
+            /* OVERLAY GELAP BIAR TEKS JELAS */
+            position: relative;
         }
+        /* Overlay gelap di atas background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.55); /* gelap 55% */
+            z-index: 0;
+        }
+
         .container {
-            background: white;
+            background: rgba(255, 255, 255, 0.92);
             border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
             padding: 30px;
             max-width: 500px;
             width: 100%;
             animation: fadeIn 0.5s ease;
             position: relative;
+            z-index: 1; /* di atas overlay */
+            backdrop-filter: blur(2px); /* efek kaca */
         }
+
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(-20px); }
             to { opacity: 1; transform: translateY(0); }
         }
+
         .header { text-align: center; margin-bottom: 25px; }
         .header h1 { font-size: 26px; color: #2c3e50; }
         .header .subtitle { font-size: 13px; color: #7f8c8d; }
 
         .waktu-box {
-            background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+            background: linear-gradient(135deg, rgba(245, 247, 250, 0.9), rgba(195, 207, 226, 0.9));
             border-radius: 15px;
             padding: 15px;
             margin-bottom: 20px;
@@ -59,6 +85,7 @@
             border-radius: 10px;
             font-size: 15px;
             font-family: 'Poppins', sans-serif;
+            background: rgba(255,255,255,0.95);
         }
         .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
             outline: none;
@@ -94,7 +121,7 @@
         .btn-group .btn { flex: 1; }
 
         .camera-section {
-            background: #f8f9fa;
+            background: rgba(248, 249, 250, 0.9);
             border-radius: 15px;
             padding: 15px;
             margin: 15px 0;
@@ -173,11 +200,9 @@
             box-shadow: 0 4px 15px rgba(0,0,0,0.25);
             text-decoration: none;
             overflow: hidden;
-            user-select: none;
-            -webkit-tap-highlight-color: transparent;
         }
         .admin-icon:hover {
-            transform: scale(1.05);
+            transform: scale(1.1);
             box-shadow: 0 6px 25px rgba(0,0,0,0.35);
         }
         .admin-icon .admin-logo {
@@ -185,7 +210,6 @@
             height: 40px;
             object-fit: contain;
             border-radius: 50%;
-            pointer-events: none;
         }
         .admin-icon .tooltip {
             display: none;
@@ -203,24 +227,6 @@
         .admin-icon:hover .tooltip {
             display: block;
         }
-        /* Efek getar saat tap salah */
-        .admin-icon.shake {
-            animation: shake 0.3s ease;
-        }
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-8px); }
-            75% { transform: translateX(8px); }
-        }
-        /* Efek glow saat tap ke-5 */
-        .admin-icon.glow {
-            animation: glow 0.5s ease;
-        }
-        @keyframes glow {
-            0% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.7); }
-            50% { box-shadow: 0 0 30px 10px rgba(231, 76, 60, 0.5); }
-            100% { box-shadow: 0 4px 15px rgba(0,0,0,0.25); }
-        }
 
         .hidden { display: none !important; }
 
@@ -232,6 +238,7 @@
             .btn-group .btn { width: 100%; }
             .admin-icon { width: 50px; height: 50px; bottom: 15px; right: 15px; }
             .admin-icon .admin-logo { width: 36px; height: 36px; }
+            body { background-attachment: scroll; }
         }
     </style>
 </head>
@@ -294,64 +301,14 @@
         <div id="message" class="message"></div>
     </div>
 
-    <!-- ADMIN ICON – dengan fitur tap 5x -->
-    <div class="admin-icon" id="adminIcon" title="Admin Panel">
+    <!-- ADMIN ICON – Logo Kustom -->
+    <a href="/login" class="admin-icon" id="adminIcon" title="Admin Panel">
         <img src="{{ url_for('static', filename='logo-admin.png') }}" alt="Admin" class="admin-logo">
         <span class="tooltip">Admin Panel</span>
-    </div>
+    </a>
 
     <script>
-        // ============ ADMIN ICON TAP 5x ============
-        (function() {
-            const adminIcon = document.getElementById('adminIcon');
-            let tapCount = 0;
-            let tapTimer = null;
-
-            function resetTap() {
-                tapCount = 0;
-                if (tapTimer) {
-                    clearTimeout(tapTimer);
-                    tapTimer = null;
-                }
-                adminIcon.classList.remove('shake', 'glow');
-            }
-
-            function handleTap(e) {
-                e.preventDefault(); // Mencegah aksi default jika ada link
-                tapCount++;
-
-                // Jika belum mencapai 5, reset timer setiap kali tap
-                if (tapTimer) {
-                    clearTimeout(tapTimer);
-                }
-                // Atur timeout 2 detik untuk reset hitungan
-                tapTimer = setTimeout(() => {
-                    resetTap();
-                }, 2000);
-
-                if (tapCount === 5) {
-                    // Sampai 5 kali, arahkan ke login
-                    resetTap(); // reset hitungan
-                    // Efek glow sebentar
-                    adminIcon.classList.add('glow');
-                    setTimeout(() => {
-                        adminIcon.classList.remove('glow');
-                        // Redirect ke halaman login
-                        window.location.href = '/login';
-                    }, 400);
-                } else {
-                    // Efek getar untuk setiap tap (kecuali yang ke-5)
-                    adminIcon.classList.add('shake');
-                    setTimeout(() => {
-                        adminIcon.classList.remove('shake');
-                    }, 300);
-                }
-            }
-
-            adminIcon.addEventListener('click', handleTap);
-        })();
-
-        // ============ VARIABEL UTAMA ============
+        // ============ VARIABEL ============
         let fotoData = null;
         let stream = null;
         let mode = 'masuk';
