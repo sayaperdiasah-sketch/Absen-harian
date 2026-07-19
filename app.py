@@ -13,15 +13,13 @@ import io
 
 app = Flask(__name__)
 app.secret_key = 'rahasia_admin_absen_12345'
-app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 
-# ============ KONFIGURASI LOGIN ============
 ADMIN_USERNAME = 'admin'
 ADMIN_PASSWORD = 'anakanakkesayanganbapak'
 
 DATA_FILE = 'data_absen.json'
 
-# ============ FUNGSI DATABASE ============
 def init_data_file():
     if not os.path.exists(DATA_FILE):
         with open(DATA_FILE, 'w') as f:
@@ -39,7 +37,6 @@ def save_data(data):
     with open(DATA_FILE, 'w') as f:
         json.dump(data, f, indent=4)
 
-# ============ DEKORATOR LOGIN ============
 def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
@@ -48,7 +45,6 @@ def login_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
-# ============ ROUTE HALAMAN ============
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -79,17 +75,13 @@ def logout():
 @app.route('/absen_masuk', methods=['POST'])
 def absen_masuk():
     nama = request.form.get('nama', '').strip()
-    
     if not nama:
         return jsonify({'status': 'error', 'message': 'Nama tidak boleh kosong!'})
-    
     data = load_data()
     today = datetime.now().strftime("%d-%m-%Y")
-    
     for item in data:
         if item.get('nama', '').lower() == nama.lower() and item.get('tanggal', '') == today and item.get('status') == 'Hadir':
             return jsonify({'status': 'error', 'message': f'{nama} sudah absen masuk hari ini!'})
-    
     now = datetime.now()
     data_baru = {
         'id': str(int(datetime.now().timestamp())),
@@ -102,30 +94,21 @@ def absen_masuk():
         'foto_masuk': None,
         'foto_keluar': None
     }
-    
     data.append(data_baru)
     save_data(data)
-    
-    return jsonify({
-        'status': 'success',
-        'message': f'✅ {nama} berhasil absen masuk pada jam {now.strftime("%H:%M:%S")}'
-    })
+    return jsonify({'status': 'success', 'message': f'✅ {nama} berhasil absen masuk pada jam {now.strftime("%H:%M:%S")}'})
 
 @app.route('/absen_keluar', methods=['POST'])
 def absen_keluar():
     nama = request.form.get('nama', '').strip()
     foto = request.form.get('foto', '')
-    
     if not nama:
         return jsonify({'status': 'error', 'message': 'Nama tidak boleh kosong!'})
-    
     if not foto:
         return jsonify({'status': 'error', 'message': '📸 Harap ambil foto terlebih dahulu!'})
-    
     data = load_data()
     today = datetime.now().strftime("%d-%m-%Y")
     found = False
-    
     for item in data:
         if (item.get('nama', '').lower() == nama.lower() and 
             item.get('tanggal', '') == today and 
@@ -135,41 +118,27 @@ def absen_keluar():
             item['foto_keluar'] = foto
             found = True
             break
-    
     if not found:
-        return jsonify({
-            'status': 'error', 
-            'message': f'❌ {nama} belum absen masuk hari ini atau sudah absen keluar!'
-        })
-    
+        return jsonify({'status': 'error', 'message': f'❌ {nama} belum absen masuk hari ini atau sudah absen keluar!'})
     save_data(data)
-    return jsonify({
-        'status': 'success',
-        'message': f'✅ {nama} berhasil absen keluar pada jam {datetime.now().strftime("%H:%M:%S")}'
-    })
+    return jsonify({'status': 'success', 'message': f'✅ {nama} berhasil absen keluar pada jam {datetime.now().strftime("%H:%M:%S")}'})
 
 @app.route('/izin', methods=['POST'])
 def izin():
     nama = request.form.get('nama', '').strip()
     keterangan = request.form.get('keterangan', '').strip()
     foto = request.form.get('foto', '')
-    
     if not nama:
         return jsonify({'status': 'error', 'message': 'Nama tidak boleh kosong!'})
-    
     if not keterangan:
         return jsonify({'status': 'error', 'message': '📝 Silakan isi keterangan!'})
-    
     if not foto:
         return jsonify({'status': 'error', 'message': '📸 Harap ambil foto!'})
-    
     data = load_data()
     today = datetime.now().strftime("%d-%m-%Y")
-    
     for item in data:
         if item.get('nama', '').lower() == nama.lower() and item.get('tanggal', '') == today and item.get('status') in ['Izin', 'Sakit', 'Dinas']:
             return jsonify({'status': 'error', 'message': f'{nama} sudah mengajukan {item.get("status")} hari ini!'})
-    
     now = datetime.now()
     data_baru = {
         'id': str(int(datetime.now().timestamp())),
@@ -182,20 +151,14 @@ def izin():
         'foto_masuk': foto,
         'foto_keluar': None
     }
-    
     data.append(data_baru)
     save_data(data)
-    
-    return jsonify({
-        'status': 'success',
-        'message': f'✅ {nama} - Izin berhasil dicatat!'
-    })
+    return jsonify({'status': 'success', 'message': f'✅ {nama} - Izin berhasil dicatat!'})
 
 # ============ API ADMIN ============
 @app.route('/api/data')
 @login_required
 def api_get_data():
-    """Ambil data untuk tabel (tanpa foto besar)"""
     data = load_data()
     for item in data:
         if 'foto_masuk' in item:
@@ -207,10 +170,8 @@ def api_get_data():
 @app.route('/api/data/full')
 @login_required
 def api_get_data_full():
-    """Ambil data lengkap dengan foto (untuk admin)"""
     try:
         data = load_data()
-        # Pastikan setiap item punya field yang dibutuhkan
         for item in data:
             if 'id' not in item:
                 item['id'] = str(int(datetime.now().timestamp()))
@@ -233,14 +194,12 @@ def api_filter_data():
     tanggal = request.args.get('tanggal', '')
     nama = request.args.get('nama', '').lower()
     status = request.args.get('status', '')
-    
     if tanggal:
         data = [d for d in data if d.get('tanggal', '') == tanggal]
     if nama:
         data = [d for d in data if nama in d.get('nama', '').lower()]
     if status:
         data = [d for d in data if d.get('status', '') == status]
-    
     return jsonify(data)
 
 @app.route('/api/data/delete/<id>', methods=['DELETE'])
@@ -266,7 +225,6 @@ def api_update_data(id):
     new_jam_keluar = request.json.get('jam_keluar')
     new_status = request.json.get('status')
     new_keterangan = request.json.get('keterangan')
-    
     for item in data:
         if item.get('id', '') == id:
             if new_nama:
@@ -280,7 +238,6 @@ def api_update_data(id):
             if new_keterangan is not None:
                 item['keterangan'] = new_keterangan
             break
-    
     save_data(data)
     return jsonify({'status': 'success', 'message': 'Data berhasil diupdate!'})
 
@@ -289,38 +246,17 @@ def api_update_data(id):
 @login_required
 def export_pdf():
     data = load_data()
-    
     if not data:
         return jsonify({'status': 'error', 'message': 'Tidak ada data untuk diexport!'})
-    
     buffer = io.BytesIO()
     doc = SimpleDocTemplate(buffer, pagesize=landscape(A4))
     elements = []
-    
     styles = getSampleStyleSheet()
-    title_style = ParagraphStyle(
-        'CustomTitle',
-        parent=styles['Heading1'],
-        fontSize=24,
-        textColor=colors.HexColor('#2c3e50'),
-        alignment=1,
-        spaceAfter=30
-    )
-    
+    title_style = ParagraphStyle('CustomTitle', parent=styles['Heading1'], fontSize=24, textColor=colors.HexColor('#2c3e50'), alignment=1, spaceAfter=30)
     elements.append(Paragraph("📋 LAPORAN REKAP ABSEN", title_style))
-    
-    date_style = ParagraphStyle(
-        'DateStyle',
-        parent=styles['Normal'],
-        fontSize=12,
-        textColor=colors.HexColor('#7f8c8d'),
-        alignment=1,
-        spaceAfter=20
-    )
+    date_style = ParagraphStyle('DateStyle', parent=styles['Normal'], fontSize=12, textColor=colors.HexColor('#7f8c8d'), alignment=1, spaceAfter=20)
     elements.append(Paragraph(f"Dicetak: {datetime.now().strftime('%d %B %Y %H:%M')}", date_style))
-    
     table_data = [['No', 'Nama', 'Tanggal', 'Jam Masuk', 'Jam Keluar', 'Status', 'Keterangan']]
-    
     for idx, item in enumerate(data, 1):
         table_data.append([
             str(idx),
@@ -331,7 +267,6 @@ def export_pdf():
             item.get('status', 'Hadir'),
             item.get('keterangan', '-')
         ])
-    
     table = Table(table_data, colWidths=[0.4*inch, 1.2*inch, 1*inch, 1*inch, 1*inch, 0.8*inch, 1.5*inch])
     table.setStyle(TableStyle([
         ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#34495e')),
@@ -346,39 +281,19 @@ def export_pdf():
         ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor('#f8f9fa')]),
         ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
     ]))
-    
     elements.append(table)
-    
-    footer_style = ParagraphStyle(
-        'Footer',
-        parent=styles['Normal'],
-        fontSize=10,
-        textColor=colors.HexColor('#95a5a6'),
-        alignment=1,
-        spaceBefore=20
-    )
+    footer_style = ParagraphStyle('Footer', parent=styles['Normal'], fontSize=10, textColor=colors.HexColor('#95a5a6'), alignment=1, spaceBefore=20)
     elements.append(Paragraph(f"Total Data: {len(data)} orang", footer_style))
-    
     doc.build(elements)
     buffer.seek(0)
-    
-    return send_file(
-        buffer,
-        as_attachment=True,
-        download_name=f'rekap_absen_{datetime.now().strftime("%Y%m%d")}.pdf',
-        mimetype='application/pdf'
-    )
+    return send_file(buffer, as_attachment=True, download_name=f'rekap_absen_{datetime.now().strftime("%Y%m%d")}.pdf', mimetype='application/pdf')
 
 # ============ WAKTU ============
 @app.route('/get_waktu')
 def get_waktu():
     now = datetime.now()
-    return jsonify({
-        'tanggal': now.strftime("%d %B %Y"),
-        'jam': now.strftime("%H:%M:%S")
-    })
+    return jsonify({'tanggal': now.strftime("%d %B %Y"), 'jam': now.strftime("%H:%M:%S")})
 
-# ============ JALANKAN APLIKASI ============
 if __name__ == '__main__':
     init_data_file()
     app.run(debug=True, host='0.0.0.0', port=5000)
