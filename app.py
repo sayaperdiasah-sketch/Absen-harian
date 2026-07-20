@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, jsonify, session, redirect, url_for, send_file
 from datetime import datetime
+from zoneinfo import ZoneInfo
 import json
 import os
 from functools import wraps
@@ -28,6 +29,14 @@ ADMIN_USERNAME = 'admin'
 ADMIN_PASSWORD = 'anakanakkesayanganbapak'
 
 DATA_FILE = 'data_absen.json'
+
+# ============ ZONA WAKTU (WIB - Jakarta/Jawa Timur) ============
+# Catatan: Jakarta & Jawa Timur sama-sama berada di zona WIB (UTC+7)
+WIB = ZoneInfo("Asia/Jakarta")
+
+def now_wib():
+    """Mengembalikan waktu saat ini pada zona waktu WIB (UTC+7)."""
+    return datetime.now(WIB)
 
 # ============ FUNGSI DATABASE ============
 def init_data_file():
@@ -97,15 +106,15 @@ def absen_masuk():
         return jsonify({'status': 'error', 'message': 'Nama tidak boleh kosong!'})
     
     data = load_data()
-    today = datetime.now().strftime("%d-%m-%Y")
+    today = now_wib().strftime("%d-%m-%Y")
     
     for item in data:
         if item.get('nama', '').lower() == nama.lower() and item.get('tanggal', '') == today and item.get('status') == 'Hadir':
             return jsonify({'status': 'error', 'message': f'{nama} sudah absen masuk hari ini!'})
     
-    now = datetime.now()
+    now = now_wib()
     data_baru = {
-        'id': str(int(datetime.now().timestamp())),
+        'id': str(int(now_wib().timestamp())),
         'nama': nama,
         'tanggal': today,
         'jam_masuk': now.strftime("%H:%M:%S"),
@@ -136,7 +145,7 @@ def absen_keluar():
         return jsonify({'status': 'error', 'message': '📸 Harap ambil foto terlebih dahulu!'})
     
     data = load_data()
-    today = datetime.now().strftime("%d-%m-%Y")
+    today = now_wib().strftime("%d-%m-%Y")
     found = False
     
     for item in data:
@@ -144,7 +153,7 @@ def absen_keluar():
             item.get('tanggal', '') == today and 
             item.get('status') == 'Hadir' and
             item.get('jam_keluar') == '-'):
-            item['jam_keluar'] = datetime.now().strftime("%H:%M:%S")
+            item['jam_keluar'] = now_wib().strftime("%H:%M:%S")
             item['foto_keluar'] = foto
             found = True
             break
@@ -158,7 +167,7 @@ def absen_keluar():
     save_data(data)
     return jsonify({
         'status': 'success',
-        'message': f'✅ {nama} berhasil absen keluar pada jam {datetime.now().strftime("%H:%M:%S")}'
+        'message': f'✅ {nama} berhasil absen keluar pada jam {now_wib().strftime("%H:%M:%S")}'
     })
 
 @app.route('/izin', methods=['POST'])
@@ -176,14 +185,14 @@ def izin():
         return jsonify({'status': 'error', 'message': '📸 Harap ambil foto!'})  # <-- SUDAH DIPERBAIKI
     
     data = load_data()
-    today = datetime.now().strftime("%d-%m-%Y")
+    today = now_wib().strftime("%d-%m-%Y")
     
     for item in data:
         if item.get('nama', '').lower() == nama.lower() and item.get('tanggal', '') == today and item.get('status') in ['Izin', 'Sakit', 'Dinas']:
             return jsonify({'status': 'error', 'message': f'{nama} sudah mengajukan {item.get("status")} hari ini!'})
     
     data_baru = {
-        'id': str(int(datetime.now().timestamp())),
+        'id': str(int(now_wib().timestamp())),
         'nama': nama,
         'tanggal': today,
         'jam_masuk': '-',
@@ -223,7 +232,7 @@ def api_get_data_full():
         data = load_data()
         for item in data:
             if 'id' not in item:
-                item['id'] = str(int(datetime.now().timestamp()))
+                item['id'] = str(int(now_wib().timestamp()))
             if 'status' not in item:
                 item['status'] = 'Hadir'
             if 'keterangan' not in item:
@@ -293,7 +302,7 @@ def export_pdf():
     title_style = ParagraphStyle('CustomTitle', parent=styles['Heading1'], fontSize=24, textColor=colors.HexColor('#2c3e50'), alignment=1, spaceAfter=30)
     elements.append(Paragraph("📋 LAPORAN REKAP ABSEN", title_style))
     date_style = ParagraphStyle('DateStyle', parent=styles['Normal'], fontSize=12, textColor=colors.HexColor('#7f8c8d'), alignment=1, spaceAfter=20)
-    elements.append(Paragraph(f"Dicetak: {datetime.now().strftime('%d %B %Y %H:%M')}", date_style))
+    elements.append(Paragraph(f"Dicetak: {now_wib().strftime('%d %B %Y %H:%M')}", date_style))
     table_data = [['No', 'Nama', 'Tanggal', 'Jam Masuk', 'Jam Keluar', 'Status', 'Keterangan']]
     for idx, item in enumerate(data, 1):
         table_data.append([
@@ -324,13 +333,13 @@ def export_pdf():
     elements.append(Paragraph(f"Total Data: {len(data)} orang", footer_style))
     doc.build(elements)
     buffer.seek(0)
-    return send_file(buffer, as_attachment=True, download_name=f'rekap_absen_{datetime.now().strftime("%Y%m%d")}.pdf', mimetype='application/pdf')
+    return send_file(buffer, as_attachment=True, download_name=f'rekap_absen_{now_wib().strftime("%Y%m%d")}.pdf', mimetype='application/pdf')
 
 # ============ WAKTU ============
 @app.route('/get_waktu')
 @limiter.limit("30 per minute")
 def get_waktu():
-    now = datetime.now()
+    now = now_wib()
     return jsonify({'tanggal': now.strftime("%d %B %Y"), 'jam': now.strftime("%H:%M:%S")})
 
 if __name__ == '__main__':
