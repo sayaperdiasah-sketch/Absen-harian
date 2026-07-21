@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Admin - Absen Harian</title>
+    <title>Admin - Agenda & Logbook</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -49,100 +49,38 @@
         .btn-sm { padding: 5px 12px; font-size: 12px; }
         .btn-purple { background: #8e44ad; }
 
-        .acara-section {
-            background: white;
-            border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 25px;
-            box-shadow: 0 2px 15px rgba(0,0,0,0.08);
-        }
-        .acara-section h3 { margin-bottom: 15px; color: #2c3e50; }
-        .acara-form { display: flex; gap: 10px; flex-wrap: wrap; align-items: end; }
-        .acara-form .form-group { display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 150px; }
-        .acara-form label { font-size: 12px; font-weight: 600; color: #2c3e50; }
-        .acara-form input, .acara-form textarea {
-            padding: 8px 12px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            font-family: 'Poppins', sans-serif;
-            font-size: 13px;
-        }
-        .acara-list { margin-top: 15px; }
-        .acara-item {
-            background: #f8f9fa;
-            padding: 10px 15px;
-            border-radius: 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 8px;
-            border-left: 4px solid #f39c12;
-        }
-        .acara-item .info { flex: 1; }
-        .acara-item .info .judul { font-weight: 600; font-size: 14px; }
-        .acara-item .info .deskripsi { font-size: 12px; color: #7f8c8d; }
-        .acara-item .info .tanggal { font-size: 11px; color: #95a5a6; }
+        .section { background: white; border-radius: 15px; padding: 20px; margin-bottom: 25px; box-shadow: 0 2px 15px rgba(0,0,0,0.08); }
+        .section h2 { font-size: 18px; margin-bottom: 15px; color: #2c3e50; }
 
-        .tanggal-list {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 15px;
-            margin-bottom: 25px;
-        }
-        .tanggal-card {
-            background: white;
-            border-radius: 15px;
-            padding: 20px;
-            box-shadow: 0 2px 15px rgba(0,0,0,0.08);
-            cursor: pointer;
-            transition: all 0.3s ease;
-            border-left: 5px solid #3498db;
+        .form-agenda { display: flex; gap: 15px; flex-wrap: wrap; align-items: end; }
+        .form-agenda .form-group { display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 150px; }
+        .form-agenda label { font-size: 12px; font-weight: 600; color: #2c3e50; }
+        .form-agenda input, .form-agenda textarea { padding: 8px 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-family: 'Poppins', sans-serif; font-size: 13px; }
+        .form-agenda textarea { resize: vertical; min-height: 60px; }
+
+        .agenda-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 15px; margin-top: 15px; }
+        .agenda-card {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 15px;
+            border-left: 4px solid #3498db;
             position: relative;
         }
-        .tanggal-card:hover { transform: translateY(-5px); box-shadow: 0 8px 30px rgba(0,0,0,0.15); }
-        .tanggal-card .tanggal-text { font-size: 18px; font-weight: 700; color: #2c3e50; }
-        .tanggal-card .tanggal-hari { font-size: 13px; color: #7f8c8d; }
-        .tanggal-card .ringkasan { display: flex; gap: 15px; margin-top: 10px; flex-wrap: wrap; }
-        .tanggal-card .ringkasan .item { font-size: 12px; background: #f0f2f5; padding: 4px 12px; border-radius: 20px; }
-        .tanggal-card .ringkasan .item .num { font-weight: 700; font-size: 14px; }
-        .tanggal-card .badge-total {
+        .agenda-card.completed { border-left-color: #27ae60; background: #e8f5e9; }
+        .agenda-card .judul { font-weight: 700; color: #2c3e50; }
+        .agenda-card .tgl { font-size: 12px; color: #7f8c8d; }
+        .agenda-card .aksi { margin-top: 10px; display: flex; gap: 8px; flex-wrap: wrap; }
+        .agenda-card .badge-status {
             position: absolute;
-            top: 15px;
-            right: 15px;
-            background: #3498db;
-            color: white;
-            padding: 3px 12px;
+            top: 10px;
+            right: 10px;
+            font-size: 11px;
+            padding: 3px 10px;
             border-radius: 20px;
-            font-size: 12px;
             font-weight: 600;
         }
-        .no-tanggal { text-align: center; padding: 40px; color: #7f8c8d; grid-column: 1 / -1; }
-
-        .detail-section {
-            background: white;
-            border-radius: 15px;
-            padding: 20px;
-            box-shadow: 0 2px 15px rgba(0,0,0,0.08);
-            display: none;
-        }
-        .detail-section.active { display: block; animation: fadeIn 0.3s ease; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-        .detail-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-            padding-bottom: 15px;
-            border-bottom: 2px solid #ecf0f1;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-        .detail-header h2 { font-size: 20px; color: #2c3e50; }
-        .detail-header .sub-info { font-size: 13px; color: #7f8c8d; }
-        .detail-header .sub-info span { font-weight: 600; color: #2c3e50; }
-        .back-btn { display: inline-block; margin-bottom: 15px; color: #3498db; cursor: pointer; font-weight: 600; font-size: 14px; }
-        .back-btn:hover { text-decoration: underline; }
+        .badge-active { background: #3498db; color: white; }
+        .badge-completed { background: #27ae60; color: white; }
 
         .table-container { overflow-x: auto; }
         table { width: 100%; border-collapse: collapse; font-size: 13px; }
@@ -170,7 +108,6 @@
         .badge-izin { background: #fff3cd; color: #856404; }
         .badge-sakit { background: #f8d7da; color: #721c24; }
         .badge-dinas { background: #cce5ff; color: #004085; }
-        .badge-pulang { background: #d6d8db; color: #383d41; }
 
         .action-btns { display: flex; gap: 5px; flex-wrap: wrap; }
         .no-data { text-align: center; padding: 30px; color: #7f8c8d; }
@@ -217,86 +154,64 @@
         @media (max-width: 768px) {
             .header { flex-direction: column; text-align: center; }
             .header-actions { justify-content: center; }
-            .acara-form { flex-direction: column; }
-            .acara-form .form-group { width: 100%; }
-            .tanggal-list { grid-template-columns: 1fr; }
-            .detail-header { flex-direction: column; text-align: center; }
+            .form-agenda { flex-direction: column; }
+            .form-agenda .form-group { width: 100%; }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>📊 Dashboard Admin</h1>
+            <h1>📊 Admin - Agenda & Logbook</h1>
             <div class="header-actions">
-                <button class="btn btn-success" onclick="exportPDF()">📄 Export PDF</button>
-                <button class="btn btn-danger" onclick="deleteAll()">🗑️ Hapus Semua</button>
                 <a href="/" class="btn btn-outline">🏠 Ke Absen</a>
                 <a href="/logout" class="btn btn-outline">🚪 Logout</a>
             </div>
         </div>
 
-        <!-- MANAJEMEN ACARA -->
-        <div class="acara-section">
-            <h3>📌 Kelola Acara Hari Ini</h3>
-            <div class="acara-form">
+        <!-- Form Buat Agenda -->
+        <div class="section">
+            <h2>📅 Buat Agenda Harian</h2>
+            <form id="formAgenda" class="form-agenda" onsubmit="buatAgenda(event)">
                 <div class="form-group">
-                    <label>Judul Acara</label>
-                    <input type="text" id="acaraJudul" placeholder="Contoh: Upacara Bendera">
+                    <label>📌 Judul Agenda</label>
+                    <input type="text" id="judulAgenda" placeholder="Contoh: Belajar Matematika" required>
                 </div>
                 <div class="form-group">
-                    <label>Deskripsi</label>
-                    <input type="text" id="acaraDeskripsi" placeholder="Contoh: Pukul 07:00 di lapangan">
+                    <label>📝 Deskripsi</label>
+                    <textarea id="deskripsiAgenda" placeholder="Detail kegiatan..."></textarea>
                 </div>
-                <button class="btn btn-success" onclick="tambahAcara()">➕ Tambah Acara</button>
-            </div>
-            <div class="acara-list" id="acaraList">
-                <p style="color:#7f8c8d; font-size:13px;">⏳ Memuat acara...</p>
+                <div class="form-group">
+                    <label>📅 Tanggal</label>
+                    <input type="date" id="tanggalAgenda" required>
+                </div>
+                <div class="form-group" style="justify-content: end;">
+                    <button type="submit" class="btn btn-primary">➕ Buat Agenda</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Daftar Agenda -->
+        <div class="section">
+            <h2>📋 Daftar Agenda</h2>
+            <div id="agendaList" class="agenda-list">
+                <div class="no-data">⏳ Memuat agenda...</div>
             </div>
         </div>
 
-        <!-- DAFTAR TANGGAL -->
-        <div id="tanggalContainer">
-            <div class="tanggal-list" id="tanggalList">
-                <div class="no-tanggal">⏳ Memuat data...</div>
-            </div>
-        </div>
-
-        <!-- DETAIL TANGGAL -->
-        <div class="detail-section" id="detailSection">
-            <div class="detail-header">
-                <div>
-                    <span class="back-btn" onclick="kembaliKeDaftar()">← Kembali ke daftar</span>
-                    <h2 id="detailTanggal">📅 Tanggal</h2>
-                </div>
-                <div class="sub-info">Total: <span id="detailTotal">0</span> data</div>
-            </div>
-            <div class="table-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>No</th>
-                            <th>Nama</th>
-                            <th>Jam Masuk</th>
-                            <th>Jam Keluar</th>
-                            <th>Status</th>
-                            <th>Keterangan</th>
-                            <th>Foto</th>
-                            <th>Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody id="detailBody">
-                        <tr><td colspan="8" class="no-data">📭 Tidak ada data</td></tr>
-                    </tbody>
-                </table>
+        <!-- Logbook / Data Absen per Agenda -->
+        <div class="section" id="logbookSection">
+            <h2>📖 Logbook Harian</h2>
+            <div id="logbookContainer">
+                <div class="no-data">Pilih agenda di atas untuk melihat logbook</div>
             </div>
         </div>
     </div>
 
-    <!-- MODAL EDIT -->
+    <!-- Modal Edit -->
     <div class="modal" id="editModal">
         <div class="modal-content">
-            <h2>✏️ Edit Data</h2>
+            <h2>✏️ Edit Data Absen</h2>
             <form id="editForm" onsubmit="updateData(event)">
                 <input type="hidden" id="editId">
                 <div class="form-group">
@@ -304,18 +219,9 @@
                     <input type="text" id="editNama" required>
                 </div>
                 <div class="form-group">
-                    <label>Jam Masuk</label>
-                    <input type="time" id="editJamMasuk">
-                </div>
-                <div class="form-group">
-                    <label>Jam Keluar</label>
-                    <input type="time" id="editJamKeluar">
-                </div>
-                <div class="form-group">
-                    <label>Status</label>
-                    <select id="editStatus">
+                    <label>Kategori</label>
+                    <select id="editKategori">
                         <option value="Hadir">Hadir</option>
-                        <option value="Pulang">Pulang</option>
                         <option value="Izin">Izin</option>
                         <option value="Sakit">Sakit</option>
                         <option value="Dinas">Dinas</option>
@@ -333,7 +239,7 @@
         </div>
     </div>
 
-    <!-- MODAL FOTO -->
+    <!-- Modal Foto -->
     <div class="modal" id="fotoModal">
         <div class="modal-content foto-modal-content">
             <h2>📷 Foto</h2>
@@ -347,200 +253,155 @@
 
     <script>
         let allData = [];
-        let currentTanggal = '';
+        let allAgenda = [];
         let currentFotoData = null;
-        let dataPerTanggal = {};
-        let acaraList = [];
 
-        // ============ ACARA ============
-        function loadAcara() {
-            fetch('/api/acara')
-                .then(res => res.json())
-                .then(data => {
-                    acaraList = data;
-                    renderAcara();
-                })
-                .catch(err => console.error('Gagal load acara:', err));
-        }
-
-        function renderAcara() {
-            const container = document.getElementById('acaraList');
-            if (acaraList.length === 0) {
-                container.innerHTML = '<p style="color:#7f8c8d; font-size:13px;">📭 Belum ada acara hari ini</p>';
-                return;
-            }
-            let html = '';
-            acaraList.forEach(a => {
-                html += `
-                    <div class="acara-item">
-                        <div class="info">
-                            <div class="judul">${a.judul}</div>
-                            <div class="deskripsi">${a.deskripsi || ''}</div>
-                            <div class="tanggal">📅 ${a.tanggal}</div>
-                        </div>
-                        <button class="btn btn-danger btn-sm" onclick="hapusAcara('${a.id}')">🗑️</button>
-                    </div>
-                `;
-            });
-            container.innerHTML = html;
-        }
-
-        function tambahAcara() {
-            const judul = document.getElementById('acaraJudul').value.trim();
-            const deskripsi = document.getElementById('acaraDeskripsi').value.trim();
-            if (!judul) {
-                alert('⚠️ Judul acara tidak boleh kosong!');
-                return;
-            }
-            const today = new Date().toLocaleDateString('id-ID', { day:'2-digit', month:'2-digit', year:'numeric' }).replace(/\//g, '-');
-            fetch('/api/acara', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ tanggal: today, judul: judul, deskripsi: deskripsi })
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.status === 'success') {
-                    alert('✅ Acara berhasil ditambahkan!');
-                    document.getElementById('acaraJudul').value = '';
-                    document.getElementById('acaraDeskripsi').value = '';
-                    loadAcara();
-                } else {
-                    alert('❌ Gagal menambahkan acara!');
-                }
-            })
-            .catch(err => alert('❌ Error: ' + err));
-        }
-
-        function hapusAcara(id) {
-            if (!confirm('Yakin ingin menghapus acara ini?')) return;
-            fetch(`/api/acara?id=${id}`, { method: 'DELETE' })
-                .then(res => res.json())
-                .then(data => {
-                    if (data.status === 'success') {
-                        loadAcara();
-                    } else {
-                        alert('❌ Gagal menghapus acara!');
-                    }
-                })
-                .catch(err => alert('❌ Error: ' + err));
-        }
-
-        // ============ DATA ABSEN ============
+        // ============ LOAD DATA ============
         function loadData() {
             fetch('/api/data/full')
                 .then(res => res.json())
                 .then(data => {
                     allData = data;
-                    groupByTanggal(data);
-                    renderTanggalList();
+                    renderLogbook();
                 })
-                .catch(err => {
-                    document.getElementById('tanggalList').innerHTML = '<div class="no-tanggal">❌ Gagal memuat data</div>';
-                    console.error(err);
-                });
+                .catch(err => console.error(err));
         }
 
-        function groupByTanggal(data) {
-            dataPerTanggal = {};
-            data.forEach(item => {
-                const tgl = item.tanggal || 'Tanpa Tanggal';
-                if (!dataPerTanggal[tgl]) dataPerTanggal[tgl] = [];
-                dataPerTanggal[tgl].push(item);
-            });
-            const sortedKeys = Object.keys(dataPerTanggal).sort((a, b) => {
-                if (a === 'Tanpa Tanggal') return 1;
-                if (b === 'Tanpa Tanggal') return -1;
-                const [d1, m1, y1] = a.split('-');
-                const [d2, m2, y2] = b.split('-');
-                return new Date(y2, m2-1, d2) - new Date(y1, m1-1, d1);
-            });
-            const sorted = {};
-            sortedKeys.forEach(key => { sorted[key] = dataPerTanggal[key]; });
-            dataPerTanggal = sorted;
+        function loadAgenda() {
+            fetch('/api/agenda')
+                .then(res => res.json())
+                .then(data => {
+                    allAgenda = data;
+                    renderAgenda();
+                })
+                .catch(err => console.error(err));
         }
 
-        function renderTanggalList() {
-            const container = document.getElementById('tanggalList');
-            const keys = Object.keys(dataPerTanggal);
-            if (keys.length === 0) {
-                container.innerHTML = '<div class="no-tanggal">📭 Belum ada data absen</div>';
+        // ============ RENDER AGENDA ============
+        function renderAgenda() {
+            const container = document.getElementById('agendaList');
+            if (!allAgenda || allAgenda.length === 0) {
+                container.innerHTML = '<div class="no-data">📭 Belum ada agenda</div>';
                 return;
             }
             let html = '';
-            const hariMap = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
-            keys.forEach(tgl => {
-                const items = dataPerTanggal[tgl];
-                const total = items.length;
-                const hadir = items.filter(d => d.status === 'Hadir' || d.status === '-').length;
-                const pulang = items.filter(d => d.status === 'Pulang').length;
-                const izin = items.filter(d => ['Izin','Sakit','Dinas'].includes(d.status)).length;
-                let hari = '';
-                if (tgl !== 'Tanpa Tanggal') {
-                    const [d, m, y] = tgl.split('-');
-                    const dateObj = new Date(y, m-1, d);
-                    hari = hariMap[dateObj.getDay()];
-                }
+            allAgenda.forEach(a => {
+                const isActive = a.status === 'active';
                 html += `
-                    <div class="tanggal-card" onclick="pilihTanggal('${tgl}')">
-                        <div class="tanggal-text">${tgl}</div>
-                        <div class="tanggal-hari">${hari}</div>
-                        <div class="ringkasan">
-                            <span class="item">✅ <span class="num">${hadir}</span> Hadir</span>
-                            <span class="item">🚪 <span class="num">${pulang}</span> Pulang</span>
-                            <span class="item">📝 <span class="num">${izin}</span> Izin</span>
-                            <span class="item">📋 <span class="num">${total}</span> Total</span>
+                    <div class="agenda-card ${isActive ? '' : 'completed'}">
+                        <div class="judul">${a.judul}</div>
+                        <div class="tgl">📅 ${a.tanggal}</div>
+                        <div style="font-size:12px;color:#555;margin:5px 0;">${a.deskripsi || '-'}</div>
+                        <span class="badge-status ${isActive ? 'badge-active' : 'badge-completed'}">
+                            ${isActive ? 'Aktif' : 'Selesai'}
+                        </span>
+                        <div class="aksi">
+                            ${isActive ? `<button class="btn btn-success btn-sm" onclick="completeAgenda('${a.id}')">✅ Selesai</button>` : ''}
+                            <button class="btn btn-primary btn-sm" onclick="lihatLogbook('${a.id}')">📖 Lihat Logbook</button>
+                            <button class="btn btn-success btn-sm" onclick="exportPDF('${a.id}')">📄 PDF</button>
                         </div>
-                        <span class="badge-total">${total} data</span>
                     </div>
                 `;
             });
             container.innerHTML = html;
         }
 
-        function pilihTanggal(tgl) {
-            currentTanggal = tgl;
-            const items = dataPerTanggal[tgl] || [];
-            document.getElementById('tanggalContainer').style.display = 'none';
-            const detail = document.getElementById('detailSection');
-            detail.classList.add('active');
-            document.getElementById('detailTanggal').textContent = `📅 ${tgl}`;
-            document.getElementById('detailTotal').textContent = items.length;
-            renderDetail(items);
-            detail.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
+        // ============ BUAT AGENDA ============
+        function buatAgenda(e) {
+            e.preventDefault();
+            const judul = document.getElementById('judulAgenda').value.trim();
+            const deskripsi = document.getElementById('deskripsiAgenda').value.trim();
+            const tanggal = document.getElementById('tanggalAgenda').value;
 
-        function renderDetail(items) {
-            const tbody = document.getElementById('detailBody');
-            if (!items || items.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="8" class="no-data">📭 Tidak ada data</td></tr>';
+            if (!judul || !tanggal) {
+                alert('Judul dan tanggal wajib diisi!');
                 return;
             }
-            let html = '';
-            items.forEach((item, idx) => {
-                const status = item.status || 'Hadir';
+
+            const formData = new FormData();
+            formData.append('judul', judul);
+            formData.append('deskripsi', deskripsi);
+            formData.append('tanggal', tanggal);
+
+            fetch('/api/agenda', {
+                method: 'POST',
+                body: formData
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    alert('✅ Agenda berhasil dibuat!');
+                    document.getElementById('judulAgenda').value = '';
+                    document.getElementById('deskripsiAgenda').value = '';
+                    document.getElementById('tanggalAgenda').value = '';
+                    loadAgenda();
+                } else {
+                    alert('❌ ' + data.message);
+                }
+            })
+            .catch(err => alert('Gagal membuat agenda!'));
+        }
+
+        // ============ COMPLETE AGENDA ============
+        function completeAgenda(id) {
+            if (!confirm('Yakin agenda ini sudah selesai?')) return;
+            fetch(`/api/agenda/complete/${id}`, { method: 'PUT' })
+                .then(res => res.json())
+                .then(data => {
+                    alert(data.message);
+                    loadAgenda();
+                })
+                .catch(err => alert('Gagal!'));
+        }
+
+        // ============ LIHAT LOGBOOK ============
+        let currentAgendaId = null;
+
+        function lihatLogbook(agendaId) {
+            currentAgendaId = agendaId;
+            const container = document.getElementById('logbookContainer');
+            const filtered = allData.filter(d => d.agenda_id === agendaId);
+            if (filtered.length === 0) {
+                container.innerHTML = '<div class="no-data">📭 Belum ada data absen untuk agenda ini</div>';
+                return;
+            }
+            let html = `
+                <div style="margin-bottom:10px;font-size:14px;color:#2c3e50;">
+                    <strong>Total: ${filtered.length} orang</strong>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>No</th>
+                                <th>Nama</th>
+                                <th>Kategori</th>
+                                <th>Keterangan</th>
+                                <th>Jam</th>
+                                <th>Foto</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+            filtered.forEach((item, idx) => {
                 const badgeClass = {
                     'Hadir': 'badge-hadir',
-                    'Pulang': 'badge-pulang',
                     'Izin': 'badge-izin',
                     'Sakit': 'badge-sakit',
                     'Dinas': 'badge-dinas'
-                }[status] || 'badge-hadir';
-                const ket = item.keterangan || '-';
+                }[item.kategori] || 'badge-hadir';
                 let fotoHtml = '-';
-                if (item.foto_masuk && item.foto_masuk.length > 100) {
-                    fotoHtml = `<button class="btn btn-primary btn-sm" onclick="lihatFoto('${item.foto_masuk}')">📷</button>`;
-                } else if (item.foto_keluar && item.foto_keluar.length > 100) {
-                    fotoHtml = `<button class="btn btn-primary btn-sm" onclick="lihatFoto('${item.foto_keluar}')">📷</button>`;
+                if (item.foto && item.foto.length > 100) {
+                    fotoHtml = `<button class="btn btn-primary btn-sm" onclick="lihatFoto('${item.foto}')">📷</button>`;
                 }
                 html += `
                     <tr>
-                        <td>${idx + 1}</td>
+                        <td>${idx+1}</td>
                         <td><strong>${item.nama}</strong></td>
-                        <td>${item.jam_masuk}</td>
-                        <td>${item.jam_keluar}</td>
-                        <td><span class="badge ${badgeClass}">${status}</span></td>
-                        <td style="max-width:120px;word-break:break-word;">${ket}</td>
+                        <td><span class="badge ${badgeClass}">${item.kategori}</span></td>
+                        <td>${item.keterangan || '-'}</td>
+                        <td>${item.jam}</td>
                         <td>${fotoHtml}</td>
                         <td>
                             <div class="action-btns">
@@ -551,52 +412,44 @@
                     </tr>
                 `;
             });
-            tbody.innerHTML = html;
+            html += `</tbody></table></div>`;
+            container.innerHTML = html;
         }
 
-        function kembaliKeDaftar() {
-            document.getElementById('tanggalContainer').style.display = 'block';
-            document.getElementById('detailSection').classList.remove('active');
-            renderTanggalList();
+        // ============ RENDER LOGBOOK (otomatis tampilkan yang pertama) ============
+        function renderLogbook() {
+            if (allAgenda.length > 0 && !currentAgendaId) {
+                // Tampilkan agenda aktif pertama
+                const active = allAgenda.find(a => a.status === 'active');
+                if (active) {
+                    lihatLogbook(active.id);
+                } else {
+                    lihatLogbook(allAgenda[0].id);
+                }
+            } else if (currentAgendaId) {
+                lihatLogbook(currentAgendaId);
+            }
         }
 
+        // ============ DELETE ============
         function deleteData(id) {
             if (!confirm('Yakin ingin menghapus data ini?')) return;
             fetch(`/api/data/delete/${id}`, { method: 'DELETE' })
                 .then(res => res.json())
                 .then(() => {
                     loadData();
-                    if (currentTanggal && document.getElementById('detailSection').classList.contains('active')) {
-                        setTimeout(() => {
-                            const items = dataPerTanggal[currentTanggal] || [];
-                            renderDetail(items);
-                            document.getElementById('detailTotal').textContent = items.length;
-                        }, 500);
-                    }
+                    if (currentAgendaId) lihatLogbook(currentAgendaId);
                 })
                 .catch(err => alert('Gagal menghapus!'));
         }
 
-        function deleteAll() {
-            if (!confirm('⚠️ Yakin ingin menghapus SEMUA data?')) return;
-            if (!confirm('Benar-benar yakin?')) return;
-            fetch('/api/data/delete_all', { method: 'DELETE' })
-                .then(res => res.json())
-                .then(() => {
-                    loadData();
-                    kembaliKeDaftar();
-                })
-                .catch(err => alert('Gagal menghapus!'));
-        }
-
+        // ============ EDIT ============
         function openEdit(id) {
             const item = allData.find(d => d.id === id);
             if (!item) return;
             document.getElementById('editId').value = id;
             document.getElementById('editNama').value = item.nama;
-            document.getElementById('editJamMasuk').value = item.jam_masuk === '-' ? '' : item.jam_masuk;
-            document.getElementById('editJamKeluar').value = item.jam_keluar === '-' ? '' : item.jam_keluar;
-            document.getElementById('editStatus').value = item.status || 'Hadir';
+            document.getElementById('editKategori').value = item.kategori || 'Hadir';
             document.getElementById('editKeterangan').value = item.keterangan || '';
             document.getElementById('editModal').classList.add('active');
         }
@@ -606,9 +459,7 @@
             const id = document.getElementById('editId').value;
             const data = {
                 nama: document.getElementById('editNama').value,
-                jam_masuk: document.getElementById('editJamMasuk').value || '-',
-                jam_keluar: document.getElementById('editJamKeluar').value || '-',
-                status: document.getElementById('editStatus').value,
+                kategori: document.getElementById('editKategori').value,
                 keterangan: document.getElementById('editKeterangan').value
             };
             fetch(`/api/data/update/${id}`, {
@@ -620,18 +471,13 @@
             .then(() => {
                 closeModal('editModal');
                 loadData();
-                if (currentTanggal && document.getElementById('detailSection').classList.contains('active')) {
-                    setTimeout(() => {
-                        const items = dataPerTanggal[currentTanggal] || [];
-                        renderDetail(items);
-                        document.getElementById('detailTotal').textContent = items.length;
-                    }, 500);
-                }
+                if (currentAgendaId) lihatLogbook(currentAgendaId);
                 alert('✅ Data berhasil diupdate!');
             })
             .catch(err => alert('Gagal update!'));
         }
 
+        // ============ FOTO ============
         function lihatFoto(fotoBase64) {
             if (!fotoBase64 || fotoBase64 === 'Ada Foto') {
                 alert('❌ Data foto tidak lengkap!');
@@ -650,6 +496,12 @@
             link.click();
         }
 
+        // ============ EXPORT PDF ============
+        function exportPDF(agendaId) {
+            window.open(`/api/export/pdf/${agendaId}`, '_blank');
+        }
+
+        // ============ MODAL ============
         function closeModal(id) {
             document.getElementById(id).classList.remove('active');
         }
@@ -660,13 +512,12 @@
             });
         }
 
-        function exportPDF() {
-            window.open('/api/export/pdf', '_blank');
-        }
-
-        // ============ INIT ============
-        loadAcara();
+        // ============ LOAD ============
+        loadAgenda();
         loadData();
+
+        // Set tanggal default ke hari ini
+        document.getElementById('tanggalAgenda').value = new Date().toISOString().split('T')[0];
     </script>
 </body>
 </html>
