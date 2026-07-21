@@ -49,6 +49,40 @@
         .btn-sm { padding: 5px 12px; font-size: 12px; }
         .btn-purple { background: #8e44ad; }
 
+        .acara-section {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.08);
+        }
+        .acara-section h3 { margin-bottom: 15px; color: #2c3e50; }
+        .acara-form { display: flex; gap: 10px; flex-wrap: wrap; align-items: end; }
+        .acara-form .form-group { display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 150px; }
+        .acara-form label { font-size: 12px; font-weight: 600; color: #2c3e50; }
+        .acara-form input, .acara-form textarea {
+            padding: 8px 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 13px;
+        }
+        .acara-list { margin-top: 15px; }
+        .acara-item {
+            background: #f8f9fa;
+            padding: 10px 15px;
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            border-left: 4px solid #f39c12;
+        }
+        .acara-item .info { flex: 1; }
+        .acara-item .info .judul { font-weight: 600; font-size: 14px; }
+        .acara-item .info .deskripsi { font-size: 12px; color: #7f8c8d; }
+        .acara-item .info .tanggal { font-size: 11px; color: #95a5a6; }
+
         .tanggal-list {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -183,6 +217,8 @@
         @media (max-width: 768px) {
             .header { flex-direction: column; text-align: center; }
             .header-actions { justify-content: center; }
+            .acara-form { flex-direction: column; }
+            .acara-form .form-group { width: 100%; }
             .tanggal-list { grid-template-columns: 1fr; }
             .detail-header { flex-direction: column; text-align: center; }
         }
@@ -200,14 +236,33 @@
             </div>
         </div>
 
-        <!-- Daftar Tanggal -->
+        <!-- MANAJEMEN ACARA -->
+        <div class="acara-section">
+            <h3>📌 Kelola Acara Hari Ini</h3>
+            <div class="acara-form">
+                <div class="form-group">
+                    <label>Judul Acara</label>
+                    <input type="text" id="acaraJudul" placeholder="Contoh: Upacara Bendera">
+                </div>
+                <div class="form-group">
+                    <label>Deskripsi</label>
+                    <input type="text" id="acaraDeskripsi" placeholder="Contoh: Pukul 07:00 di lapangan">
+                </div>
+                <button class="btn btn-success" onclick="tambahAcara()">➕ Tambah Acara</button>
+            </div>
+            <div class="acara-list" id="acaraList">
+                <p style="color:#7f8c8d; font-size:13px;">⏳ Memuat acara...</p>
+            </div>
+        </div>
+
+        <!-- DAFTAR TANGGAL -->
         <div id="tanggalContainer">
             <div class="tanggal-list" id="tanggalList">
                 <div class="no-tanggal">⏳ Memuat data...</div>
             </div>
         </div>
 
-        <!-- Detail Tanggal -->
+        <!-- DETAIL TANGGAL -->
         <div class="detail-section" id="detailSection">
             <div class="detail-header">
                 <div>
@@ -238,7 +293,7 @@
         </div>
     </div>
 
-    <!-- Modal Edit -->
+    <!-- MODAL EDIT -->
     <div class="modal" id="editModal">
         <div class="modal-content">
             <h2>✏️ Edit Data</h2>
@@ -278,7 +333,7 @@
         </div>
     </div>
 
-    <!-- Modal Foto -->
+    <!-- MODAL FOTO -->
     <div class="modal" id="fotoModal">
         <div class="modal-content foto-modal-content">
             <h2>📷 Foto</h2>
@@ -295,7 +350,83 @@
         let currentTanggal = '';
         let currentFotoData = null;
         let dataPerTanggal = {};
+        let acaraList = [];
 
+        // ============ ACARA ============
+        function loadAcara() {
+            fetch('/api/acara')
+                .then(res => res.json())
+                .then(data => {
+                    acaraList = data;
+                    renderAcara();
+                })
+                .catch(err => console.error('Gagal load acara:', err));
+        }
+
+        function renderAcara() {
+            const container = document.getElementById('acaraList');
+            if (acaraList.length === 0) {
+                container.innerHTML = '<p style="color:#7f8c8d; font-size:13px;">📭 Belum ada acara hari ini</p>';
+                return;
+            }
+            let html = '';
+            acaraList.forEach(a => {
+                html += `
+                    <div class="acara-item">
+                        <div class="info">
+                            <div class="judul">${a.judul}</div>
+                            <div class="deskripsi">${a.deskripsi || ''}</div>
+                            <div class="tanggal">📅 ${a.tanggal}</div>
+                        </div>
+                        <button class="btn btn-danger btn-sm" onclick="hapusAcara('${a.id}')">🗑️</button>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
+        function tambahAcara() {
+            const judul = document.getElementById('acaraJudul').value.trim();
+            const deskripsi = document.getElementById('acaraDeskripsi').value.trim();
+            if (!judul) {
+                alert('⚠️ Judul acara tidak boleh kosong!');
+                return;
+            }
+            const today = new Date().toLocaleDateString('id-ID', { day:'2-digit', month:'2-digit', year:'numeric' }).replace(/\//g, '-');
+            fetch('/api/acara', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ tanggal: today, judul: judul, deskripsi: deskripsi })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    alert('✅ Acara berhasil ditambahkan!');
+                    document.getElementById('acaraJudul').value = '';
+                    document.getElementById('acaraDeskripsi').value = '';
+                    loadAcara();
+                } else {
+                    alert('❌ Gagal menambahkan acara!');
+                }
+            })
+            .catch(err => alert('❌ Error: ' + err));
+        }
+
+        function hapusAcara(id) {
+            if (!confirm('Yakin ingin menghapus acara ini?')) return;
+            fetch(`/api/acara?id=${id}`, { method: 'DELETE' })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        loadAcara();
+                    } else {
+                        alert('❌ Gagal menghapus acara!');
+                    }
+                })
+                .catch(err => alert('❌ Error: ' + err));
+        }
+
+        // ============ DATA ABSEN ============
         function loadData() {
             fetch('/api/data/full')
                 .then(res => res.json())
@@ -317,7 +448,6 @@
                 if (!dataPerTanggal[tgl]) dataPerTanggal[tgl] = [];
                 dataPerTanggal[tgl].push(item);
             });
-            // Urutkan tanggal terbaru
             const sortedKeys = Object.keys(dataPerTanggal).sort((a, b) => {
                 if (a === 'Tanpa Tanggal') return 1;
                 if (b === 'Tanpa Tanggal') return -1;
@@ -449,7 +579,7 @@
 
         function deleteAll() {
             if (!confirm('⚠️ Yakin ingin menghapus SEMUA data?')) return;
-            if (!confirm('Benar-benar yakin? Tindakan tidak bisa dibatalkan!')) return;
+            if (!confirm('Benar-benar yakin?')) return;
             fetch('/api/data/delete_all', { method: 'DELETE' })
                 .then(res => res.json())
                 .then(() => {
@@ -534,6 +664,8 @@
             window.open('/api/export/pdf', '_blank');
         }
 
+        // ============ INIT ============
+        loadAcara();
         loadData();
     </script>
 </body>
