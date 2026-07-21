@@ -112,12 +112,10 @@ def logout():
 # ============ API AGENDA ============
 @app.route('/api/agenda/today', methods=['GET'])
 def get_today_agenda():
-    """Ambil agenda untuk hari ini"""
     agenda = load_agenda()
     today = today_str()
     if today not in agenda:
         return jsonify([])
-    # Urutkan berdasarkan jam mulai
     items = agenda[today]
     items.sort(key=lambda x: x.get('jam_mulai', '00:00'))
     return jsonify(items)
@@ -126,12 +124,11 @@ def get_today_agenda():
 @login_required
 @limiter.limit("10 per minute")
 def create_agenda():
-    """Buat agenda baru untuk hari ini"""
     data = request.json
     nama = data.get('nama', '').strip()
     jam_mulai = data.get('jam_mulai', '')
     jam_selesai = data.get('jam_selesai', '')
-    batas_telat = data.get('batas_telat', '')  # format "HH:MM"
+    batas_telat = data.get('batas_telat', '')
     
     if not nama:
         return jsonify({'status': 'error', 'message': 'Nama agenda harus diisi!'})
@@ -143,7 +140,6 @@ def create_agenda():
     if today not in agenda:
         agenda[today] = []
     
-    # Buat ID unik
     agenda_id = str(int(now_wib().timestamp()))
     
     agenda[today].append({
@@ -162,30 +158,25 @@ def create_agenda():
 @login_required
 @limiter.limit("10 per minute")
 def set_agenda_selesai(agenda_id):
-    """Tandai agenda sebagai selesai"""
     today = today_str()
     agenda = load_agenda()
     if today not in agenda:
         return jsonify({'status': 'error', 'message': 'Agenda tidak ditemukan!'})
-    
     for item in agenda[today]:
         if item['id'] == agenda_id:
             item['selesai'] = True
             save_agenda(agenda)
             return jsonify({'status': 'success', 'message': 'Agenda selesai!'})
-    
     return jsonify({'status': 'error', 'message': 'Agenda tidak ditemukan!'})
 
 @app.route('/api/agenda/<agenda_id>', methods=['DELETE'])
 @login_required
 @limiter.limit("10 per minute")
 def delete_agenda(agenda_id):
-    """Hapus agenda"""
     today = today_str()
     agenda = load_agenda()
     if today not in agenda:
         return jsonify({'status': 'error', 'message': 'Agenda tidak ditemukan!'})
-    
     agenda[today] = [a for a in agenda[today] if a['id'] != agenda_id]
     save_agenda(agenda)
     return jsonify({'status': 'success', 'message': 'Agenda dihapus!'})
@@ -201,8 +192,9 @@ def absen_masuk():
     if not nama:
         return jsonify({'status': 'error', 'message': 'Nama tidak boleh kosong!'})
     
-    # Cek agenda jika dipilih
     agenda_nama = '-'
+    is_terlambat = False  # <-- DEFAULT TIDAK TELAT
+    
     if agenda_id:
         today = today_str()
         agenda = load_agenda()
@@ -210,14 +202,11 @@ def absen_masuk():
             for a in agenda[today]:
                 if a['id'] == agenda_id:
                     agenda_nama = a['nama']
-                    # Cek batas telat
+                    # ===== CEK TELAT =====
                     if a.get('batas_telat') and a['batas_telat'] != '-':
                         now = now_wib().strftime("%H:%M")
                         if now > a['batas_telat']:
-                            return jsonify({
-                                'status': 'error',
-                                'message': f'⏰ Melewati batas telat! Batas: {a["batas_telat"]}'
-                            })
+                            is_terlambat = True  # <-- TETAP BISA ABSEN, TAPI TERCATAT TELAT
                     break
     
     data = load_data()
@@ -229,6 +218,12 @@ def absen_masuk():
             return jsonify({'status': 'error', 'message': f'{nama} sudah absen masuk hari ini!'})
     
     now = now_wib()
+    
+    # Buat keterangan dengan tambahan (TELAT) jika telat
+    keterangan = f'Agenda: {agenda_nama}'
+    if is_terlambat:
+        keterangan += ' (TELAT)'
+    
     data_baru = {
         'id': str(int(now.timestamp())),
         'nama': nama,
@@ -236,20 +231,27 @@ def absen_masuk():
         'jam_masuk': now.strftime("%H:%M:%S"),
         'jam_keluar': '-',
         'status': 'Hadir',
-        'keterangan': f'Agenda: {agenda_nama}',
+        'keterangan': keterangan,
         'agenda_id': agenda_id or None,
         'foto_masuk': foto if foto else None,
         'foto_keluar': None,
-        'is_terlambat': False
+        'is_terlambat': is_terlambat  # <-- SIMPAN STATUS TELAT
     }
     
     data.append(data_baru)
     save_data(data)
     
-    return jsonify({
-        'status': 'success',
-        'message': f'✅ {nama} - {agenda_nama} - Hadir pada {now.strftime("%H:%M:%S")}'
-    })
+    # Pesan sukses berbeda jika telat
+    if is_terlambat:
+        return jsonify({
+            'status': 'success',
+            'message': f'⚠️ {nama} - {agenda_nama} - Hadir TELAT pada {now.strftime("%H:%M:%S")}'
+        })
+    else:
+        return jsonify({
+            'status': 'success',
+            'message': f'✅ {nama} - {agenda_nama} - Hadir pada {now.strftime("%H:%M:%S")}'
+        })
 
 @app.route('/absen_keluar', methods=['POST'])
 @limiter.limit("5 per minute")
