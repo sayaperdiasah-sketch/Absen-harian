@@ -29,19 +29,21 @@ ADMIN_USERNAME = 'admin'
 ADMIN_PASSWORD = 'anakanakkesayanganbapak'
 
 DATA_FILE = 'data_absen.json'
+ACARA_FILE = 'acara.json'
 
-# ============ ZONA WAKTU (WIB - Jakarta/Jawa Timur) ============
-# Catatan: Jakarta & Jawa Timur sama-sama berada di zona WIB (UTC+7)
+# ============ ZONA WAKTU WIB ============
 WIB = ZoneInfo("Asia/Jakarta")
 
 def now_wib():
-    """Mengembalikan waktu saat ini pada zona waktu WIB (UTC+7)."""
     return datetime.now(WIB)
 
 # ============ FUNGSI DATABASE ============
 def init_data_file():
     if not os.path.exists(DATA_FILE):
         with open(DATA_FILE, 'w') as f:
+            json.dump([], f)
+    if not os.path.exists(ACARA_FILE):
+        with open(ACARA_FILE, 'w') as f:
             json.dump([], f)
 
 def load_data():
@@ -54,6 +56,18 @@ def load_data():
 
 def save_data(data):
     with open(DATA_FILE, 'w') as f:
+        json.dump(data, f, indent=4)
+
+def load_acara():
+    init_data_file()
+    with open(ACARA_FILE, 'r') as f:
+        try:
+            return json.load(f)
+        except:
+            return []
+
+def save_acara(data):
+    with open(ACARA_FILE, 'w') as f:
         json.dump(data, f, indent=4)
 
 # ============ DEKORATOR LOGIN ============
@@ -69,13 +83,17 @@ def login_required(f):
 @app.route('/')
 @limiter.limit("30 per minute")
 def index():
-    return render_template('index.html')
+    acara_hari_ini = load_acara()
+    today = now_wib().strftime("%d-%m-%Y")
+    acara = [a for a in acara_hari_ini if a.get('tanggal', '') == today]
+    return render_template('index.html', acara=acara)
 
 @app.route('/admin')
 @login_required
 @limiter.limit("20 per minute")
 def admin():
-    return render_template('admin.html')
+    acara = load_acara()
+    return render_template('admin.html', acara=acara)
 
 @app.route('/login', methods=['GET', 'POST'])
 @limiter.limit("10 per minute")
@@ -94,6 +112,32 @@ def login():
 def logout():
     session.clear()
     return redirect(url_for('login'))
+
+# ============ API ACARA ============
+@app.route('/api/acara', methods=['GET', 'POST', 'DELETE'])
+@login_required
+def api_acara():
+    if request.method == 'GET':
+        return jsonify(load_acara())
+    
+    elif request.method == 'POST':
+        data = request.json
+        acara = load_acara()
+        acara.append({
+            'id': str(int(now_wib().timestamp())),
+            'tanggal': data.get('tanggal'),
+            'judul': data.get('judul'),
+            'deskripsi': data.get('deskripsi', '')
+        })
+        save_acara(acara)
+        return jsonify({'status': 'success', 'message': 'Acara berhasil ditambahkan!'})
+    
+    elif request.method == 'DELETE':
+        acara_id = request.args.get('id')
+        acara = load_acara()
+        acara = [a for a in acara if a.get('id') != acara_id]
+        save_acara(acara)
+        return jsonify({'status': 'success', 'message': 'Acara berhasil dihapus!'})
 
 # ============ API ABSEN ============
 @app.route('/absen_masuk', methods=['POST'])
@@ -182,7 +226,7 @@ def izin():
     if not keterangan:
         return jsonify({'status': 'error', 'message': '📝 Silakan isi keterangan!'})
     if not foto:
-        return jsonify({'status': 'error', 'message': '📸 Harap ambil foto!'})  # <-- SUDAH DIPERBAIKI
+        return jsonify({'status': 'error', 'message': '📸 Harap ambil foto!'})
     
     data = load_data()
     today = now_wib().strftime("%d-%m-%Y")
