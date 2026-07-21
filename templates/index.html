@@ -15,17 +15,13 @@
             justify-content: center;
             align-items: center;
             padding: 15px;
-
-            /* === BACKGROUND DENGAN FOTO === */
             background-image: url("{{ url_for('static', filename='bg-absen.jpg') }}");
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
             background-attachment: fixed;
-
             position: relative;
         }
-        /* Overlay gelap di atas background */
         body::before {
             content: '';
             position: fixed;
@@ -58,6 +54,29 @@
         .header { text-align: center; margin-bottom: 25px; }
         .header h1 { font-size: 26px; color: #2c3e50; }
         .header .subtitle { font-size: 13px; color: #7f8c8d; }
+
+        .acara-box {
+            background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+            border-radius: 12px;
+            padding: 12px 15px;
+            margin-bottom: 20px;
+            border-left: 5px solid #f39c12;
+        }
+        .acara-box .acara-judul {
+            font-weight: 700;
+            color: #856404;
+            font-size: 14px;
+        }
+        .acara-box .acara-deskripsi {
+            font-size: 13px;
+            color: #6c5200;
+            margin-top: 3px;
+        }
+        .acara-box .acara-kosong {
+            font-size: 13px;
+            color: #856404;
+            text-align: center;
+        }
 
         .waktu-box {
             background: linear-gradient(135deg, rgba(245, 247, 250, 0.9), rgba(195, 207, 226, 0.9));
@@ -165,6 +184,12 @@
             font-size: 14px;
             margin-top: 10px;
         }
+        .btn-switch-camera {
+            background: linear-gradient(135deg, #8e44ad, #9b59b6);
+            padding: 10px;
+            font-size: 14px;
+            margin-top: 10px;
+        }
         .foto-status {
             font-size: 12px;
             font-weight: 600;
@@ -185,7 +210,6 @@
         .message.success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; display: block; }
         .message.error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; display: block; }
 
-        /* ===== ADMIN ICON ===== */
         .admin-icon {
             position: fixed;
             bottom: 20px;
@@ -232,7 +256,6 @@
             display: block;
         }
 
-        /* ===== COOLDOWN INDICATOR ===== */
         .cooldown-text {
             text-align: center;
             font-size: 12px;
@@ -263,6 +286,16 @@
         <div class="header">
             <h1>📋 Absen Harian</h1>
             <div class="subtitle">Sistem Absensi Online</div>
+        </div>
+
+        <!-- ACARA HARI INI -->
+        <div class="acara-box">
+            {% if acara %}
+                <div class="acara-judul">📌 {{ acara[0].judul }}</div>
+                <div class="acara-deskripsi">{{ acara[0].deskripsi }}</div>
+            {% else %}
+                <div class="acara-kosong">📭 Belum ada acara hari ini</div>
+            {% endif %}
         </div>
 
         <div class="waktu-box">
@@ -301,6 +334,9 @@
                 <button type="button" class="btn btn-camera" id="btnKamera" onclick="startCamera()">
                     📷 Buka Kamera
                 </button>
+                <button type="button" class="btn btn-switch-camera" id="btnSwitchCamera" onclick="switchCamera()">
+                    🔄 Ganti Kamera
+                </button>
                 <button type="button" class="btn btn-capture hidden" id="btnCapture" onclick="capturePhoto()">
                     📸 Ambil Foto
                 </button>
@@ -318,26 +354,21 @@
         <div id="message" class="message"></div>
     </div>
 
-    <!-- ADMIN ICON – Logo Kustom -->
+    <!-- ADMIN ICON -->
     <a href="/login" class="admin-icon" id="adminIcon" title="Admin Panel">
         <img src="{{ url_for('static', filename='logo-admin.png') }}" alt="Admin" class="admin-logo">
         <span class="tooltip">Admin Panel</span>
     </a>
 
     <script>
-        // =============================================
-        // ============ VARIABEL ============
-        // =============================================
         let fotoData = null;
         let stream = null;
         let mode = 'masuk';
         let cameraActive = false;
         let fotoRequired = false;
-        let isCooldown = false;  // <-- CEK COOLDOWN
+        let isCooldown = false;
+        let facingMode = 'environment'; // 'environment' atau 'user'
 
-        // =============================================
-        // ============ UPDATE WAKTU ============
-        // =============================================
         function updateWaktu() {
             fetch('/get_waktu')
                 .then(r => r.json())
@@ -350,9 +381,6 @@
         updateWaktu();
         setInterval(updateWaktu, 1000);
 
-        // =============================================
-        // ============ UBAH MODE ============
-        // =============================================
         function ubahMode() {
             mode = document.getElementById('jenis').value;
             const ketGroup = document.getElementById('keteranganGroup');
@@ -361,7 +389,6 @@
             const fotoStatus = document.getElementById('fotoStatus');
             const preview = document.getElementById('previewImg');
 
-            // Reset foto
             fotoData = null;
             preview.style.display = 'none';
             document.getElementById('video').style.display = 'none';
@@ -371,6 +398,7 @@
             document.getElementById('btnKamera').classList.remove('hidden');
             document.getElementById('btnKamera').textContent = '📷 Buka Kamera';
             document.getElementById('btnKamera').className = 'btn btn-camera';
+            document.getElementById('btnSwitchCamera').classList.remove('hidden');
             
             if (stream) {
                 stream.getTracks().forEach(t => t.stop());
@@ -378,7 +406,6 @@
                 cameraActive = false;
             }
 
-            // Reset cooldown kalau lagi aktif
             if (isCooldown) {
                 isCooldown = false;
                 document.getElementById('cooldownText').classList.remove('active');
@@ -401,7 +428,7 @@
                 fotoRequired = true;
                 fotoStatus.textContent = '📸 Wajib ambil foto!';
                 fotoStatus.className = 'foto-status error';
-            } else { // izin
+            } else {
                 ketGroup.classList.remove('hidden');
                 btnSubmit.className = 'btn btn-izin';
                 btnSubmit.textContent = '📝 Kirim Izin';
@@ -412,9 +439,6 @@
             }
         }
 
-        // =============================================
-        // ============ KAMERA ============
-        // =============================================
         function startCamera() {
             const video = document.getElementById('video');
             const preview = document.getElementById('previewImg');
@@ -433,7 +457,7 @@
 
             if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
                 navigator.mediaDevices.getUserMedia({
-                    video: { facingMode: 'environment', width: { ideal: 640 } },
+                    video: { facingMode: facingMode, width: { ideal: 640 } },
                     audio: false
                 })
                 .then(s => {
@@ -457,6 +481,13 @@
                 });
             } else {
                 alert('❌ Browser tidak mendukung kamera!');
+            }
+        }
+
+        function switchCamera() {
+            facingMode = (facingMode === 'environment') ? 'user' : 'environment';
+            if (cameraActive || stream) {
+                startCamera();
             }
         }
 
@@ -522,11 +553,7 @@
             }
         }
 
-        // =============================================
-        // ============ SUBMIT (DENGAN COOLDOWN) ============
-        // =============================================
         function submitAbsen() {
-            // CEK COOLDOWN – cegah spam
             if (isCooldown) {
                 showMessage('⏳ Tunggu 5 detik sebelum kirim lagi!', 'error');
                 return;
@@ -537,14 +564,12 @@
             const keterangan = document.getElementById('keterangan').value.trim();
             const btnSubmit = document.getElementById('btnSubmit');
 
-            // Validasi nama
             if (!nama) {
                 showMessage('❌ Silakan masukkan nama!', 'error');
                 document.getElementById('nama').focus();
                 return;
             }
 
-            // Validasi foto untuk keluar & izin
             if (jenis === 'keluar' || jenis === 'izin') {
                 if (!fotoData) {
                     showMessage('📸 Wajib ambil foto terlebih dahulu!', 'error');
@@ -552,19 +577,16 @@
                 }
             }
 
-            // Validasi keterangan untuk izin
             if (jenis === 'izin' && !keterangan) {
                 showMessage('📝 Silakan isi keterangan!', 'error');
                 return;
             }
 
-            // ===== AKTIFKAN COOLDOWN =====
             isCooldown = true;
             btnSubmit.disabled = true;
             btnSubmit.textContent = '⏳ Memproses...';
             document.getElementById('cooldownText').classList.add('active');
 
-            // Siapkan request
             let url, formData = new FormData();
             formData.append('nama', nama);
 
@@ -574,13 +596,12 @@
             } else if (jenis === 'keluar') {
                 url = '/absen_keluar';
                 formData.append('foto', fotoData);
-            } else { // izin
+            } else {
                 url = '/izin';
                 formData.append('keterangan', keterangan);
                 formData.append('foto', fotoData);
             }
 
-            // Kirim request
             fetch(url, {
                 method: 'POST',
                 body: formData
@@ -589,7 +610,6 @@
             .then(data => {
                 if (data.status === 'success') {
                     showMessage(data.message, 'success');
-                    // Reset form
                     document.getElementById('nama').value = '';
                     document.getElementById('keterangan').value = '';
                     fotoData = null;
@@ -606,14 +626,10 @@
                 console.error(err);
             })
             .finally(() => {
-                // Mulai cooldown 5 detik
                 startCooldown();
             });
         }
 
-        // =============================================
-        // ============ COOLDOWN 5 DETIK ============
-        // =============================================
         function startCooldown() {
             const btnSubmit = document.getElementById('btnSubmit');
             const cooldownText = document.getElementById('cooldownText');
@@ -631,11 +647,9 @@
                     cooldownText.textContent = '⏳ Tunggu ' + timer + ' detik sebelum kirim lagi...';
                 } else {
                     clearInterval(interval);
-                    // Selesai cooldown
                     isCooldown = false;
                     btnSubmit.disabled = false;
                     cooldownText.classList.remove('active');
-                    // Kembalikan teks tombol sesuai mode
                     if (mode === 'masuk') btnSubmit.textContent = '✅ Absen Masuk';
                     else if (mode === 'keluar') btnSubmit.textContent = '🚪 Absen Keluar';
                     else btnSubmit.textContent = '📝 Kirim Izin';
@@ -643,9 +657,6 @@
             }, 1000);
         }
 
-        // =============================================
-        // ============ SHOW MESSAGE ============
-        // =============================================
         function showMessage(msg, type) {
             const div = document.getElementById('message');
             div.textContent = msg;
@@ -657,9 +668,6 @@
             }, 5000);
         }
 
-        // =============================================
-        // ============ ENTER ============
-        // =============================================
         document.getElementById('nama').addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 e.preventDefault();
@@ -667,9 +675,6 @@
             }
         });
 
-        // =============================================
-        // ============ INISIALISASI ============
-        // =============================================
         ubahMode();
     </script>
 </body>
